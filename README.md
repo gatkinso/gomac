@@ -8,5 +8,5 @@ Create a Go package that will allow a developer to write a fully functional Endp
 
 ## Aspirations
 
-Create a Go package that will allow a developer to write a fully functional Network eEtension for MacOS.
+Create a Go package that will allow a developer to write a fully functional Network Extension for MacOS.
 

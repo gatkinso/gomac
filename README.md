@@ -1,6 +1,6 @@
 # gomac
 
-A Go wrapper for the Apple System Extention, Endpoint Security Frameworks.
+A Go wrapper for the Apple System Extentions, Endpoint Security, and eventually Network Extension Frameworks.
 
 ## Goals
 
@@ -8,5 +8,5 @@ Create a Go package that will allow a developer to write a fully functional Endp
 
 ## Aspirations
 
-Create a Go package that will allow a developer to write a fully functional Endpoint Security network extension for MacOS.
+Create a Go package that will allow a developer to write a fully functional Network eEtension for MacOS.
 

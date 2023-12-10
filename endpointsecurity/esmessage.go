@@ -2466,73 +2466,73 @@ type Es_event_xpc_connect_t struct {
  * Union of all possible events that can appear in an es_message_t
  */
 type Es_events_t struct {
-	access                    Es_event_access_t
-	chdir                     Es_event_chdir_t
-	chroot                    Es_event_chroot_t
-	clone                     Es_event_clone_t
-	close                     Es_event_close_t
-	copyfile                  Es_event_copyfile_t
-	create                    Es_event_create_t
-	cs_invalidated            Es_event_cs_invalidated_t
-	deleteextattr             Es_event_deleteextattr_t
-	dup                       Es_event_dup_t
-	exchangedata              Es_event_exchangedata_t
-	exec                      Es_event_exec_t
-	exit                      Es_event_exit_t
-	file_provider_materialize Es_event_file_provider_materialize_t
-	file_provider_update      Es_event_file_provider_update_t
-	fcntl                     Es_event_fcntl_t
-	fork                      Es_event_fork_t
-	fsgetpath                 Es_event_fsgetpath_t
-	get_task                  Es_event_get_task_t
-	get_task_read             Es_event_get_task_read_t
-	get_task_inspect          Es_event_get_task_inspect_t
-	get_task_name             Es_event_get_task_name_t
-	getattrlist               Es_event_getattrlist_t
-	getextattr                Es_event_getextattr_t
-	iokit_open                Es_event_iokit_open_t
-	kextload                  Es_event_kextload_t
-	kextunload                Es_event_kextunload_t
-	link                      Es_event_link_t
-	listextattr               Es_event_listextattr_t
-	lookup                    Es_event_lookup_t
-	mmap                      Es_event_mmap_t
-	mount                     Es_event_mount_t
-	mprotect                  Es_event_mprotect_t
-	open                      Es_event_open_t
-	proc_check                Es_event_proc_check_t
-	proc_suspend_resume       Es_event_proc_suspend_resume_t
-	pty_close                 Es_event_pty_close_t
-	pty_grant                 Es_event_pty_grant_t
-	readdir                   Es_event_readdir_t
-	readlink                  Es_event_readlink_t
-	remote_thread_create      Es_event_remote_thread_create_t
-	remount                   Es_event_remount_t
-	rename                    Es_event_rename_t
-	searchfs                  Es_event_searchfs_t
-	setacl                    Es_event_setacl_t
-	setattrlist               Es_event_setattrlist_t
-	setextattr                Es_event_setextattr_t
-	setflags                  Es_event_setflags_t
-	setmode                   Es_event_setmode_t
-	setowner                  Es_event_setowner_t
-	settime                   Es_event_settime_t
-	setuid                    Es_event_setuid_t
-	setgid                    Es_event_setgid_t
-	seteuid                   Es_event_seteuid_t
-	setegid                   Es_event_setegid_t
-	setreuid                  Es_event_setreuid_t
-	setregid                  Es_event_setregid_t
-	signal                    Es_event_signal_t
-	stat                      Es_event_stat_t
-	trace                     Es_event_trace_t
-	truncate                  Es_event_truncate_t
-	uipc_bind                 Es_event_uipc_bind_t
-	uipc_connect              Es_event_uipc_connect_t
-	unlink                    Es_event_unlink_t
-	unmount                   Es_event_unmount_t
-	utimes                    Es_event_utimes_t
-	write                     Es_event_write_t
+	access                    *Es_event_access_t
+	chdir                     *Es_event_chdir_t
+	chroot                    *Es_event_chroot_t
+	clone                     *Es_event_clone_t
+	close                     *Es_event_close_t
+	copyfile                  *Es_event_copyfile_t
+	create                    *Es_event_create_t
+	cs_invalidated            *Es_event_cs_invalidated_t
+	deleteextattr             *Es_event_deleteextattr_t
+	dup                       *Es_event_dup_t
+	exchangedata              *Es_event_exchangedata_t
+	exec                      *Es_event_exec_t
+	exit                      *Es_event_exit_t
+	file_provider_materialize *Es_event_file_provider_materialize_t
+	file_provider_update      *Es_event_file_provider_update_t
+	fcntl                     *Es_event_fcntl_t
+	fork                      *Es_event_fork_t
+	fsgetpath                 *Es_event_fsgetpath_t
+	get_task                  *Es_event_get_task_t
+	get_task_read             *Es_event_get_task_read_t
+	get_task_inspect          *Es_event_get_task_inspect_t
+	get_task_name             *Es_event_get_task_name_t
+	getattrlist               *Es_event_getattrlist_t
+	getextattr                *Es_event_getextattr_t
+	iokit_open                *Es_event_iokit_open_t
+	kextload                  *Es_event_kextload_t
+	kextunload                *Es_event_kextunload_t
+	link                      *Es_event_link_t
+	listextattr               *Es_event_listextattr_t
+	lookup                    *Es_event_lookup_t
+	mmap                      *Es_event_mmap_t
+	mount                     *Es_event_mount_t
+	mprotect                  *Es_event_mprotect_t
+	open                      *Es_event_open_t
+	proc_check                *Es_event_proc_check_t
+	proc_suspend_resume       *Es_event_proc_suspend_resume_t
+	pty_close                 *Es_event_pty_close_t
+	pty_grant                 *Es_event_pty_grant_t
+	readdir                   *Es_event_readdir_t
+	readlink                  *Es_event_readlink_t
+	remote_thread_create      *Es_event_remote_thread_create_t
+	remount                   *Es_event_remount_t
+	rename                    *Es_event_rename_t
+	searchfs                  *Es_event_searchfs_t
+	setacl                    *Es_event_setacl_t
+	setattrlist               *Es_event_setattrlist_t
+	setextattr                *Es_event_setextattr_t
+	setflags                  *Es_event_setflags_t
+	setmode                   *Es_event_setmode_t
+	setowner                  *Es_event_setowner_t
+	settime                   *Es_event_settime_t
+	setuid                    *Es_event_setuid_t
+	setgid                    *Es_event_setgid_t
+	seteuid                   *Es_event_seteuid_t
+	setegid                   *Es_event_setegid_t
+	setreuid                  *Es_event_setreuid_t
+	setregid                  *Es_event_setregid_t
+	signal                    *Es_event_signal_t
+	stat                      *Es_event_stat_t
+	trace                     *Es_event_trace_t
+	truncate                  *Es_event_truncate_t
+	uipc_bind                 *Es_event_uipc_bind_t
+	uipc_connect              *Es_event_uipc_connect_t
+	unlink                    *Es_event_unlink_t
+	unmount                   *Es_event_unmount_t
+	utimes                    *Es_event_utimes_t
+	write                     *Es_event_write_t
 	//
 	// Events added in macOS 13.0 or later use nonnull pointers.
 	//
@@ -2666,13 +2666,13 @@ type Es_message_t struct {
 	deadline       uint64
 	process        *Es_process_t
 	seq_num        uint64
-	action_type    Es_action_type_t
+	action_type    *Es_action_type_t
 	action         interface{}
 	event_type     Es_event_type_t
-	event          Es_events_t
+	event          *Es_events_t
 	thread         *Es_thread_t
 	global_seq_num uint64
-	opaque         []uint64
+	//opaque         []uint64
 }
 
 /*

@@ -2801,7 +2801,7 @@ func Es_exec_env(event *Es_event_exec_t, index uint32) Es_string_token_t {
  * Reading an fd where `index` >= `es_exec_fd_count()` is undefined
  */
 func Es_exec_fd(event *Es_event_exec_t, index uint32) *Es_fd_t {
-	return &es_fd_t{}
+	return &Es_fd_t{}
 }
 
 // TODO typedef struct statfs Es_statfs_t;

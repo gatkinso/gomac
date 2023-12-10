@@ -1,20 +1,20 @@
 package endpointsecurity
 
-type es_client_t struct{}
+type Es_client_t struct{}
 
 /**
  * es_handler_block_t The type of block that will be invoked to handled messages from the ES subsystem
  * The es_client_t is a handle to the client being sent the event. It must be passed to any "respond" functions
  * The es_message_t is the message that must be handled
  */
-type es_handler_block_t func()
+type Es_handler_block_t func()
 
 /**
  * Subscribe to some set of events
  * @param client The client that will be subscribing
  * @param events Array of es_event_type_t to subscribe to
  * @param event_count Count of es_event_type_t in `events`
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  *
  * @note Subscribing to new event types does not remove previous subscriptions.
  *
@@ -24,7 +24,7 @@ type es_handler_block_t func()
  *       cause early boot to time out, resulting in a bad user experience and
  *       risking watchdog timeout panics.
  */
-func es_subscribe(client *es_client_t, events *es_event_type_t, event_count uint32) es_return_t {
+func Es_subscribe(client *Es_client_t, events *Es_event_type_t, event_count uint32) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -33,19 +33,19 @@ func es_subscribe(client *es_client_t, events *es_event_type_t, event_count uint
  * @param client The client that will be unsubscribing
  * @param events Array of es_event_type_t to unsubscribe from
  * @param event_count Count of es_event_type_t in `events`
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  * @note Events not included in the given `events` array that were previously subscribed to will continue to be subscribed to
  */
-func es_unsubscribe(client *es_client_t, events *es_event_type_t, event_count uint32) es_return_t {
+func Es_unsubscribe(client *Es_client_t, events *Es_event_type_t, event_count uint32) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
 /**
  * Unsubscribe from all events
  * @param client The client that will be unsubscribing
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  */
-func es_unsubscribe_all(client *es_client_t) es_return_t {
+func Es_unsubscribe_all(client *Es_client_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -54,15 +54,15 @@ func es_unsubscribe_all(client *es_client_t) es_return_t {
  * @param client The client for which subscriptions will be listed
  * @param count Out param that reports the number of subscriptions written
  * @param subscriptions  Out param for pointer to subscription data
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  * @brief The caller takes ownership of the memory at `*subscriptions` and must free it
  */
-func es_subscriptions(client *es_client_t, count *int64, subscriptions **es_event_type_t) es_return_t {
+func Es_subscriptions(client *Es_client_t, count *int64, subscriptions **Es_event_type_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
 /**
- * Respond to an auth event that requires an es_auth_result_t response
+ * Respond to an auth event that requires an Es_auth_result_t response
  * @param client The client that produced the event
  * @param message The message being responded to
  * @param result A result indicating the action the ES subsystem should take
@@ -72,10 +72,10 @@ func es_subscriptions(client *es_client_t, count *int64, subscriptions **es_even
  *        the cache entry.  A cache hit leads to no AUTH event being produced,
  *        while still producing a NOTIFY event normally.
  *        The cache argument is ignored for events that do not support caching.
- * @return es_respond_result_t indicating success or an error
+ * @return Es_respond_result_t indicating success or an error
  * @brief Some events must be responded to with `es_respond_flags_result`. Responding to flags events with this function will fail.
  */
-func es_respond_auth_result(client *es_client_t, message *es_message_t, result es_auth_result_t, cache bool) es_respond_result_t {
+func Es_respond_auth_result(client *Es_client_t, message *Es_message_t, result Es_auth_result_t, cache bool) Es_respond_result_t {
 	return ES_RESPOND_RESULT_SUCCESS
 }
 
@@ -92,7 +92,7 @@ func es_respond_auth_result(client *es_client_t, message *es_message_t, result e
  *        the cache entry.  A cache hit leads to no AUTH event being produced,
  *        while still producing a NOTIFY event normally.
  *        The cache argument is ignored for events that do not support caching.
- * @return es_respond_result_t indicating success or an error
+ * @return Es_respond_result_t indicating success or an error
  * @brief Some events must be responded to with `es_respond_auth_result`. Responding to auth events with the function will fail.
  * @note Enabling caching caches authorized_flags.  Subsequent cache hits
  *       will result in the event being allowed only if the flags of the
@@ -104,7 +104,7 @@ func es_respond_auth_result(client *es_client_t, message *es_message_t, result e
  *       events getting unintentionally denied if they have flags set
  *       that were not set in the cached authorized_flags.
  */
-func es_respond_flags_result(client *es_client_t, message *es_message_t, authorized_flags uint32, cache bool) es_respond_result_t {
+func Es_respond_flags_result(client *Es_client_t, message *Es_message_t, authorized_flags uint32, cache bool) Es_respond_result_t {
 	return ES_RESPOND_RESULT_SUCCESS
 }
 
@@ -114,11 +114,11 @@ func es_respond_flags_result(client *es_client_t, message *es_message_t, authori
  * @param client The client for which events will be suppressed
  * @param audit_token The audit token of the process for which events will be suppressed
  *
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  *
  * @see es_mute_process_events
  */
-func es_mute_process(client *es_client_t, audit_token *audit_token_t) es_return_t {
+func Es_mute_process(client *Es_client_t, audit_token *audit_token_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -130,11 +130,11 @@ func es_mute_process(client *es_client_t, audit_token *audit_token_t) es_return_
  * @param events Array of event types for which the audit_token should be muted.
  * @param event_count The number of items in the `events` array.
  *
- * @return es_return_t A value indicating whether or not the process was successfully muted.
+ * @return Es_return_t A value indicating whether or not the process was successfully muted.
  *
  * @see es_mute_process
  */
-func es_mute_process_events(client *es_client_t, audit_token *audit_token_t, events *es_event_type_t, event_count int) es_return_t {
+func Es_mute_process_events(client *Es_client_t, audit_token *audit_token_t, events *Es_event_type_t, event_count int) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -144,11 +144,11 @@ func es_mute_process_events(client *es_client_t, audit_token *audit_token_t, eve
  * @param client The client for which the process will be unmuted
  * @param audit_token The audit token of the process to be unmuted
  *
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  *
  * @see es_unmute_process_events
  */
-func es_unmute_process(client *es_client_t, audit_token *audit_token_t) es_return_t {
+func Es_unmute_process(client *Es_client_t, audit_token *audit_token_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -160,11 +160,11 @@ func es_unmute_process(client *es_client_t, audit_token *audit_token_t) es_retur
  * @param events Array of event types to unmute for the process
  * @param event_count The number of items in the `events` array.
  *
- * @return es_return_t A value indicating whether or not the process was successfully unmuted.
+ * @return Es_return_t A value indicating whether or not the process was successfully unmuted.
  *
  * @see es_unmute_path
  */
-func es_unmute_process_events(client *es_client_t, audit_token *audit_token_t, events *es_event_type_t, event_count int) es_return_t {
+func Es_unmute_process_events(client *Es_client_t, audit_token *audit_token_t, events *Es_event_type_t, event_count int) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -173,7 +173,7 @@ func es_unmute_process_events(client *es_client_t, audit_token *audit_token_t, e
  * @param client The client for which muted processes will be listed
  * @param count Out param that reports the number of audit tokens written
  * @param audit_tokens  Out param for pointer to audit_token data
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  * @brief The caller takes ownership of the memory at `*audit_tokens` and must free it.
  *        If there are no muted processes and the call completes successfully,
  *        `*count` is set to 0 and `*audit_token` is set to NULL.
@@ -181,7 +181,7 @@ func es_unmute_process_events(client *es_client_t, audit_token *audit_token_t, e
  *       `es_mute_process` and may not accurately reflect the current state of the
  *       respective processes.
  */
-func es_muted_processes(client *es_client_t, count *int, audit_tokens **audit_token_t) es_return_t {
+func Es_muted_processes(client *Es_client_t, count *int, audit_tokens **audit_token_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -192,12 +192,12 @@ func es_muted_processes(client *es_client_t, count *int, audit_tokens **audit_to
  * @param muted_processes OUT param the will contain newly created memory describing the set of
  *        muted processes. This memory must be deleted using `es_release_muted_processes`.
  *
- * @return es_return_t A value indicating whether or not the list of muted processes were
+ * @return Es_return_t A value indicating whether or not the list of muted processes were
  *         successfully retrieved.
  *
  * @see es_release_muted_processes
  */
-func es_muted_processes_events(client *es_client_t, muted_processes **es_muted_processes_t) es_return_t {
+func Es_muted_processes_events(client *Es_client_t, muted_processes **Es_muted_processes_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -208,7 +208,7 @@ func es_muted_processes_events(client *es_client_t, muted_processes **es_muted_p
  *
  * @see es_muted_processes_all_events
  */
-func es_release_muted_processes(muted_processes *es_muted_processes_t) {
+func Es_release_muted_processes(muted_processes *Es_muted_processes_t) {
 }
 
 /**
@@ -218,7 +218,7 @@ func es_release_muted_processes(muted_processes *es_muted_processes_t) {
  * @param path The path to mute.
  * @param type Describes the type of the `path` parameter.
  *
- * @return es_return_t A value indicating whether or not the path was successfully muted.
+ * @return Es_return_t A value indicating whether or not the path was successfully muted.
  *
  * @note Path-based muting applies to the real and potentially firmlinked path
  *       of a file as seen by VFS, and as available from fcntl(2) F_GETPATH.
@@ -283,7 +283,7 @@ func es_release_muted_processes(muted_processes *es_muted_processes_t) {
  * GET_TASK_INSPECT: The path of the process for which the task inspect port will be retrieved
  * COPYFILE: The path to the source file and the path to either the new file to be created or the existing file to be overwritten
  */
-func es_mute_path(client *es_client_t, path string, path_type es_mute_path_type_t) es_return_t {
+func Es_mute_path(client *Es_client_t, path string, path_type Es_mute_path_type_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -296,7 +296,7 @@ func es_mute_path(client *es_client_t, path string, path_type es_mute_path_type_
  * @param events Array of event types for which the path should be muted.
  * @param event_count The number of items in the `events` array.
  *
- * @return es_return_t A value indicating whether or not the path was successfully muted.
+ * @return Es_return_t A value indicating whether or not the path was successfully muted.
  *
  * @see es_mute_path
  * @discussion when using ES_MUTE_PATH_TYPE_TARGET_PREFIX and ES_MUTE_PATH_TYPE_TARGET_LITERAL not all events are supported.
@@ -305,7 +305,7 @@ func es_mute_path(client *es_client_t, path string, path_type es_mute_path_type_
  * If all specified event types do not support target muting ES_RETURN_ERROR is returned.
  * See es_mute_path for the list of events that support target path muting.
  */
-func es_mute_path_events(client *es_client_t, path string, path_type es_mute_path_type_t, events *es_event_type_t, event_count int) es_return_t {
+func Es_mute_path_events(client *Es_client_t, path string, path_type Es_mute_path_type_t, events *Es_event_type_t, event_count int) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -316,9 +316,9 @@ func es_mute_path_events(client *es_client_t, path string, path_type es_mute_pat
  *
  * @param client The client for which events will be suppressed
  * @param path_prefix The path against which suppressed executables must prefix match
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  */
-func es_mute_path_prefix(client *es_client_t, path_prefix string) es_return_t {
+func Es_mute_path_prefix(client *Es_client_t, path_prefix string) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -329,32 +329,32 @@ func es_mute_path_prefix(client *es_client_t, path_prefix string) es_return_t {
  *
  * @param client The client for which events will be suppressed
  * @param path_literal The path against which suppressed executables must match exactly
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  *
  * @see es_mute_path
  * @see es_mute_path_events
  */
-func es_mute_path_literal(client *es_client_t, path_literal string) es_return_t {
+func Es_mute_path_literal(client *Es_client_t, path_literal string) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
 /**
  * Unmute all paths
  * @param client The client for which all currently muted paths will be unmuted
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  *
  * @note Only unmutes executable paths. To unmute target paths see: `es_unmute_all_target_paths`.
  */
-func es_unmute_all_paths(client *es_client_t) es_return_t {
+func Es_unmute_all_paths(client *Es_client_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
 /**
  * Unmute all target paths
  * @param client The client for which all currently muted target paths will be unmuted
- * @return es_return_t indicating success or error
+ * @return Es_return_t indicating success or error
  */
-func es_unmute_all_target_paths(client *es_client_t) es_return_t {
+func Es_unmute_all_target_paths(client *Es_client_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -365,7 +365,7 @@ func es_unmute_all_target_paths(client *es_client_t) es_return_t {
  * @param path The path to unmute.
  * @param type Describes the type of the `path` parameter, either a prefix path or literal path.
  *
- * @return es_return_t A value indicating whether or not the path was successfully unmuted.
+ * @return Es_return_t A value indicating whether or not the path was successfully unmuted.
  *
  * @note Muting and unmuting operations logically work on a set of (path_type, path, es_event_type_t) tuples
  * Subtracting an element from the set that is not present has no effect
@@ -376,7 +376,7 @@ func es_unmute_all_target_paths(client *es_client_t) es_return_t {
  *
  * @see es_unmute_path_events
  */
-func es_unmute_path(client *es_client_t, path string, path_type es_mute_path_type_t) es_return_t {
+func Es_unmute_path(client *Es_client_t, path string, path_type Es_mute_path_type_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -389,12 +389,12 @@ func es_unmute_path(client *es_client_t, path string, path_type es_mute_path_typ
  * @param events Array of event types for which the path should be unmuted.
  * @param event_count The number of items in the `events` array.
  *
- * @return es_return_t A value indicating whether or not the path was successfully unmuted.
+ * @return Es_return_t A value indicating whether or not the path was successfully unmuted.
  *
  * @see es_unmute_path
  */
-func es_unmute_path_events(client *es_client_t, path string, path_type es_mute_path_type_t,
-	events *es_event_type_t, event_count int) es_return_t {
+func Es_unmute_path_events(client *Es_client_t, path string, path_type Es_mute_path_type_t,
+	events *Es_event_type_t, event_count int) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -405,11 +405,11 @@ func es_unmute_path_events(client *es_client_t, path string, path_type es_mute_p
  * @param muted_paths OUT param the will contain newly created memory describing the set of
  *        muted paths. This memory must be deleted using `es_release_muted_paths`.
  *
- * @return es_return_t A value indicating whether or not the list of muted paths were successfully retrieved.
+ * @return Es_return_t A value indicating whether or not the list of muted paths were successfully retrieved.
  *
  * @see es_release_muted_paths
  */
-func es_muted_paths_events(client *es_client_t, muted_paths **es_muted_paths_t) es_return_t {
+func Es_muted_paths_events(client *Es_client_t, muted_paths **Es_muted_paths_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -420,7 +420,7 @@ func es_muted_paths_events(client *es_client_t, muted_paths **es_muted_paths_t) 
  *
  * @see es_muted_paths_events
  */
-func es_release_muted_paths(muted_paths *es_muted_paths_t) {
+func Es_release_muted_paths(muted_paths *Es_muted_paths_t) {
 }
 
 /*
@@ -429,7 +429,7 @@ func es_release_muted_paths(muted_paths *es_muted_paths_t) {
  * @param client The es_client_t for which muting will be inverted
  * @param mute_type The type of muting to invert (process, path, or target path).
  *
- * @return es_return_t A value indicating whether or not muting was inverted
+ * @return Es_return_t A value indicating whether or not muting was inverted
  *
  * @discussion Inverting muting can be used to create a client that monitors a specific process(es) or set of directories
  * When muting is inverted it still combines with other types of muting using OR, and inversion happens first.
@@ -516,7 +516,7 @@ func es_release_muted_paths(muted_paths *es_muted_paths_t) {
  * If desired the default mute set can be saved using `es_muted_paths_events` and then restored after inverting again.
  *
 */
-func es_invert_muting(client *es_client_t, mute_type es_mute_inversion_type_t) es_return_t {
+func Es_invert_muting(client *Es_client_t, mute_type Es_mute_inversion_type_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -528,7 +528,7 @@ func es_invert_muting(client *es_client_t, mute_type es_mute_inversion_type_t) e
  *
  * @return es_mute_inverted_return_t Indicates if muting was inverted, not inverted, or if an error occurred.
  */
-func es_muting_inverted(client *es_client_t, mute_type es_mute_inversion_type_t) es_mute_inverted_return_t {
+func Es_muting_inverted(client *Es_client_t, mute_type Es_mute_inversion_type_t) Es_mute_inverted_return_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -540,7 +540,7 @@ func es_muting_inverted(client *es_client_t, mute_type es_mute_inversion_type_t)
  *             If es_clear_cache is called too frequently it will return ES_CLEAR_CACHE_RESULT_ERR_THROTTLE
  *             It is permissible to pass any valid es_client_t object created by `es_new_client`
  */
-func es_clear_cache(client *es_client_t) es_clear_cache_result_t {
+func Es_clear_cache(client *Es_client_t) Es_clear_cache_result_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -585,7 +585,7 @@ func es_clear_cache(client *es_client_t) es_clear_cache_result_t {
  * @see es_muted_paths_events
  * @see es_unmute_path_events
  */
-func es_new_client(client **es_client_t, handler es_handler_block_t) es_new_client_result_t {
+func Es_new_client(client **Es_client_t, handler Es_handler_block_t) Es_new_client_result_t {
 	return ES_RETURN_SUCCESS
 }
 
@@ -596,6 +596,6 @@ func es_new_client(client **es_client_t, handler es_handler_block_t) es_new_clie
  *          ES_RETURN_ERROR indicates an error occurred during shutdown and resources were leaked.
  * @note Must be called from the same thread that originally called `es_new_client`.
  */
-func es_delete_client(client *es_client_t) es_return_t {
+func Es_delete_client(client *Es_client_t) Es_return_t {
 	return ES_RETURN_SUCCESS
 }

@@ -88,7 +88,7 @@ type uuid_t struct {
  */
 
 /**
- * @brief es_file_t provides the stat information and path to a file that relates to a security
+ * @brief Es_file_t provides the stat information and path to a file that relates to a security
  * event. The path may be truncated, which is indicated by the path_truncated flag.
  *
  * @field path Absolute path of the file
@@ -102,7 +102,7 @@ type uuid_t struct {
  * Overlong paths are truncated at a maximum length that currently is 16K, though that number is not considered API and may change at any time.
  *
  */
-type es_file_t struct {
+type Es_file_t struct {
 	path           string
 	path_truncated bool
 	stat           os.FileInfo
@@ -113,7 +113,7 @@ type es_file_t struct {
  *
  * @field thread_id The unique thread ID of the thread.
  */
-type es_thread_t struct {
+type Es_thread_t struct {
 	thread_id uint64
 }
 
@@ -182,7 +182,7 @@ type es_thread_t struct {
  *   framework to do so, but should be cautious of the potentially significant performance cost.  The
  *   EndpointSecurity subsystem itself has no role in verifying the validity of code signatures.
  */
-type es_process_t struct {
+type Es_process_t struct {
 	audit_token             audit_token_t
 	ppid                    int32
 	original_ppid           int32
@@ -192,10 +192,10 @@ type es_process_t struct {
 	is_platform_binary      bool
 	is_es_client            bool
 	cdhash                  [20]uint8
-	signing_id              es_string_token_t
-	team_id                 es_string_token_t
-	executable              *es_file_t
-	tty                     *es_file_t
+	signing_id              Es_string_token_t
+	team_id                 Es_string_token_t
+	executable              *Es_file_t
+	tty                     *Es_file_t
 	start_time              time.Time
 	responsible_audit_token audit_token_t
 	parent_audit_token      audit_token_t
@@ -212,9 +212,9 @@ type es_process_t struct {
  * for working with thread state can be found in the include file `mach/thread_status.h` and
  * corresponding machine-dependent headers.
  */
-type es_thread_state_t struct {
+type Es_thread_state_t struct {
 	flavor int
-	state  es_token_t
+	state  Es_token_t
 }
 
 /**
@@ -227,7 +227,7 @@ type es_thread_state_t struct {
  * @field extra.pipe.pipe_id Unique id of the pipe for correlation with other
  *        file descriptors pointing to the same or other end of the same pipe.
  */
-type es_fd_t struct {
+type Es_fd_t struct {
 	fd     int32
 	fdtype uint32
 	pipe   struct {
@@ -235,10 +235,10 @@ type es_fd_t struct {
 	}
 }
 
-type es_btm_item_type_t int
+type Es_btm_item_type_t int
 
 const (
-	ES_BTM_ITEM_TYPE_USER_ITEM es_btm_item_type_t = iota
+	ES_BTM_ITEM_TYPE_USER_ITEM Es_btm_item_type_t = iota
 	ES_BTM_ITEM_TYPE_APP
 	ES_BTM_ITEM_TYPE_LOGIN_ITEM
 	ES_BTM_ITEM_TYPE_AGENT
@@ -257,19 +257,19 @@ const (
  *                              to app_url.
  * @field app_url               Optional.  URL for app the item is attributed to.
  */
-type es_btm_launch_item_t struct {
-	item_type es_btm_item_type_t
+type Es_btm_launch_item_t struct {
+	item_type Es_btm_item_type_t
 	legacy    bool
 	managed   bool
 	uid       int
-	item_url  es_string_token_t
-	app_url   es_string_token_t
+	item_url  Es_string_token_t
+	app_url   Es_string_token_t
 }
 
-type es_profile_source_t int
+type Es_profile_source_t int
 
 const (
-	ES_PROFILE_SOURCE_MANAGED es_profile_source_t = iota
+	ES_PROFILE_SOURCE_MANAGED Es_profile_source_t = iota
 	ES_PROFILE_SOURCE_INSTALL
 )
 
@@ -283,13 +283,13 @@ const (
  * @field display_name		Profile display name.
  * @field scope				Profile scope.
  */
-type es_profile_t struct {
-	identifier     es_string_token_t
-	uuid           es_string_token_t
-	install_source es_profile_source_t
-	organization   es_string_token_t
-	display_name   es_string_token_t
-	scope          es_string_token_t
+type Es_profile_t struct {
+	identifier     Es_string_token_t
+	uuid           Es_string_token_t
+	install_source Es_profile_source_t
+	organization   Es_string_token_t
+	display_name   Es_string_token_t
+	scope          Es_string_token_t
 }
 
 type cpu_type_t struct {
@@ -356,12 +356,12 @@ type cpu_subtype_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target executable file)
  */
-type es_event_exec_t struct {
-	target           *es_process_t
-	dyld_exec_path   es_string_token_t
+type Es_event_exec_t struct {
+	target           *Es_process_t
+	dyld_exec_path   Es_string_token_t
 	reserved         [64]uint8
-	script           *es_file_t
-	cwd              *es_file_t
+	script           *Es_file_t
+	cwd              *Es_file_t
 	last_fd          int
 	image_cputype    cpu_type_t
 	image_cpusubtype cpu_subtype_t
@@ -375,16 +375,16 @@ type es_event_exec_t struct {
  *
  * @note: The `fflag` field represents the mask as applied by the kernel, not as represented by typical
  * open(2) `oflag` values. When responding to `ES_EVENT_TYPE_AUTH_OPEN` events using
- * es_respond_flags_result(), ensure that the same FFLAG values are used (e.g. FREAD, FWRITE instead
+ * Es_respond_flags_result(), ensure that the same FFLAG values are used (e.g. FREAD, FWRITE instead
  * of O_RDONLY, O_RDWR, etc...).
  *
  * @note Cache key for this event type:  (process executable file, file that will be opened)
  *
  * @see fcntl.h
  */
-type es_event_open_t struct {
+type Es_event_open_t struct {
 	fflag    int32
-	file     *es_file_t
+	file     *Es_file_t
 	reserved [64]uint8
 }
 
@@ -395,8 +395,8 @@ type es_event_open_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_kextload_t struct {
-	identifier es_string_token_t
+type Es_event_kextload_t struct {
+	identifier Es_string_token_t
 	reserved   [64]uint8
 }
 
@@ -407,8 +407,8 @@ type es_event_kextload_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_kextunload_t struct {
-	identifier es_string_token_t
+type Es_event_kextunload_t struct {
+	identifier Es_string_token_t
 	reserved   [64]uint8
 }
 
@@ -423,9 +423,9 @@ type es_event_kextunload_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_unlink_t struct {
-	target     *es_file_t
-	parent_dir *es_file_t
+type Es_event_unlink_t struct {
+	target     *Es_file_t
+	parent_dir *Es_file_t
 	reserved   [64]uint8
 }
 
@@ -440,12 +440,12 @@ type es_event_unlink_t struct {
  *
  * @note Cache key for this event type:  (process executable file, source file)
  */
-type es_event_mmap_t struct {
+type Es_event_mmap_t struct {
 	protection     int32
 	max_protection int32
 	flags          int32
 	file_pos       uint64
-	source         *es_file_t
+	source         *Es_file_t
 	reserved       [64]uint8
 }
 
@@ -458,10 +458,10 @@ type es_event_mmap_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_link_t struct {
-	source          *es_file_t
-	target_dir      *es_file_t
-	target_filename es_string_token_t
+type Es_event_link_t struct {
+	source          *Es_file_t
+	target_dir      *Es_file_t
+	target_filename Es_string_token_t
 	reserved        [64]uint8
 }
 
@@ -472,7 +472,7 @@ type es_event_link_t struct {
 *
 * @note Cache key for this event type:  (process executable file, mount point)
  */
-type es_event_mount_t struct {
+type Es_event_mount_t struct {
 	statfs   *statfs_t
 	reserved [64]uint8
 }
@@ -484,7 +484,7 @@ type es_event_mount_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_unmount_t struct {
+type Es_event_unmount_t struct {
 	statfs   *statfs_t
 	reserved [64]uint8
 }
@@ -496,7 +496,7 @@ type es_event_unmount_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_remount_t struct {
+type Es_event_remount_t struct {
 	statfs   *statfs_t
 	reserved [64]uint8
 }
@@ -508,8 +508,8 @@ type es_event_remount_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_fork_t struct {
-	child    *es_process_t
+type Es_event_fork_t struct {
+	child    *Es_process_t
 	reserved [64]uint8
 }
 
@@ -522,7 +522,7 @@ type es_event_fork_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_mprotect_t struct {
+type Es_event_mprotect_t struct {
 	protection int32
 	address    uint64
 	size       uint64
@@ -539,16 +539,16 @@ type es_event_mprotect_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target process executable file)
  */
-type es_event_signal_t struct {
+type Es_event_signal_t struct {
 	sig      int
-	target   *es_process_t
+	target   *Es_process_t
 	reserved [64]uint8
 }
 
-type es_destination_type_t int
+type Es_destination_type_t int
 
 const (
-	ES_DESTINATION_TYPE_EXISTING_FILE es_destination_type_t = iota
+	ES_DESTINATION_TYPE_EXISTING_FILE Es_destination_type_t = iota
 	ES_DESTINATION_TYPE_NEW_PATH
 )
 
@@ -572,14 +572,14 @@ const (
  *
  * @note This event type does not support caching.
  */
-type es_event_rename_t struct {
-	source           *es_file_t
-	destination_type es_destination_type_t
+type Es_event_rename_t struct {
+	source           *Es_file_t
+	destination_type Es_destination_type_t
 	destination      struct {
-		existing_file *es_file_t
+		existing_file *Es_file_t
 		new_path      struct {
-			dir      *es_file_t
-			filename es_string_token_t
+			dir      *Es_file_t
+			filename Es_string_token_t
 		}
 	}
 	reserved [64]uint8
@@ -593,9 +593,9 @@ type es_event_rename_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_setextattr_t struct {
-	target   *es_file_t
-	extattr  es_string_token_t
+type Es_event_setextattr_t struct {
+	target   *Es_file_t
+	extattr  Es_string_token_t
 	reserved [64]uint8
 }
 
@@ -607,9 +607,9 @@ type es_event_setextattr_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target file)
  */
-type es_event_getextattr_t struct {
-	target   *es_file_t
-	extattr  es_string_token_t
+type Es_event_getextattr_t struct {
+	target   *Es_file_t
+	extattr  Es_string_token_t
 	reserved [64]uint8
 }
 
@@ -621,9 +621,9 @@ type es_event_getextattr_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_deleteextattr_t struct {
-	target   *es_file_t
-	extattr  es_string_token_t
+type Es_event_deleteextattr_t struct {
+	target   *Es_file_t
+	extattr  Es_string_token_t
 	reserved [64]uint8
 }
 
@@ -638,9 +638,9 @@ type es_event_deleteextattr_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target file)
  */
-type es_event_setmode_t struct {
+type Es_event_setmode_t struct {
 	mode     uint32
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -655,9 +655,9 @@ type es_event_setmode_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target file)
  */
-type es_event_setflags_t struct {
+type Es_event_setflags_t struct {
 	flags    uint32
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -673,10 +673,10 @@ type es_event_setflags_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target file)
  */
-type es_event_setowner_t struct {
+type Es_event_setowner_t struct {
 	uid      uint32
 	gid      uint32
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -698,20 +698,20 @@ type es_event_setowner_t struct {
  * The `modified` flag only reflects that a file was or was not modified by filesystem syscall.
  * If a file was only modifed though a memory mapping this flag will be false, but was_mapped_writable will be true.
  */
-type es_event_close_t struct {
+type Es_event_close_t struct {
 	modified bool
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
 type new_path_t struct {
-	dir      es_file_t
+	dir      Es_file_t
 	filename string
 	mode     os.FileMode
 }
 
 type destination_t struct {
-	existing_file *es_file_t
+	existing_file *Es_file_t
 	np            new_path_t
 }
 
@@ -728,7 +728,7 @@ type destination_t struct {
  *        @note The acl provided cannot be directly used by functions within
  *        the <sys/acl.h> header. These functions can mutate the struct passed
  *        into them, which is not compatible with the immutable nature of
- *        es_message_t. Additionally, because this field is minimally constructed,
+ *        Es_message_t. Additionally, because this field is minimally constructed,
  *        you must not use `acl_dup(3)` to get a mutable copy, as this can lead to
  *        out of bounds memory access. To obtain a acl_t struct that is able to be
  *        used with all functions within <sys/acl.h>, please use a combination of
@@ -749,7 +749,7 @@ type destination_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_create_t struct {
+type Es_event_create_t struct {
 	destination_type string
 	destination      destination_t
 	acl              *acl_t
@@ -762,7 +762,7 @@ type es_event_create_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_exit_t struct {
+type Es_event_exit_t struct {
 	stat     int
 	reserved [64]uint8
 }
@@ -775,9 +775,9 @@ type es_event_exit_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_exchangedata_t struct {
-	file1    *es_file_t
-	file2    *es_file_t
+type Es_event_exchangedata_t struct {
+	file1    *Es_file_t
+	file2    *Es_file_t
 	reserved [64]uint8
 }
 
@@ -788,8 +788,8 @@ type es_event_exchangedata_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_write_t struct {
-	target   *es_file_t
+type Es_event_write_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -800,8 +800,8 @@ type es_event_write_t struct {
  *
  * @note This event type does not support caching.
  */
-type es_event_truncate_t struct {
-	target   *es_file_t
+type Es_event_truncate_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -812,8 +812,8 @@ type es_event_truncate_t struct {
  *
  * @note Cache key for this event type:  (process executable file, target directory)
  */
-type es_event_chdir_t struct {
-	target   *es_file_t
+type Es_event_chdir_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
@@ -824,373 +824,373 @@ type es_event_chdir_t struct {
  *
  * @note This event type does not support caching (notify-only).
  */
-type es_event_stat_t struct {
-	target   *es_file_t
+type Es_event_stat_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_chroot_t struct {
-	target   *es_file_t
+type Es_event_chroot_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_listextattr_t struct {
-	target   *es_file_t
+type Es_event_listextattr_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_iokit_open_t struct {
+type Es_event_iokit_open_t struct {
 	user_client_type  uint32
-	user_client_class es_string_token_t
+	user_client_class Es_string_token_t
 	reserved          [64]uint8
 }
 
-type es_get_task_type_t int
+type Es_get_task_type_t int
 
 const (
-	ES_GET_TASK_TYPE_TASK_FOR_PID es_get_task_type_t = iota
+	ES_GET_TASK_TYPE_TASK_FOR_PID Es_get_task_type_t = iota
 	ES_GET_TASK_TYPE_EXPOSE_TASK
 	ES_GET_TASK_TYPE_IDENTITY_TOKEN
 )
 
-type es_event_get_task_t struct {
-	target   *es_process_t
-	type_    es_get_task_type_t
+type Es_event_get_task_t struct {
+	target   *Es_process_t
+	type_    Es_get_task_type_t
 	reserved [60]uint8
 }
 
-type es_event_get_task_read_t struct {
-	target   *es_process_t
-	type_    es_get_task_type_t
+type Es_event_get_task_read_t struct {
+	target   *Es_process_t
+	type_    Es_get_task_type_t
 	reserved [60]uint8
 }
 
-type es_event_get_task_inspect_t struct {
-	target   *es_process_t
-	type_    es_get_task_type_t
+type Es_event_get_task_inspect_t struct {
+	target   *Es_process_t
+	type_    Es_get_task_type_t
 	reserved [60]uint8
 }
 
-type es_event_get_task_name_t struct {
-	target   *es_process_t
-	type_    es_get_task_type_t
+type Es_event_get_task_name_t struct {
+	target   *Es_process_t
+	type_    Es_get_task_type_t
 	reserved [60]uint8
 }
 
-type es_event_getattrlist_t struct {
+type Es_event_getattrlist_t struct {
 	attrlist struct{}
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_setattrlist_t struct {
+type Es_event_setattrlist_t struct {
 	attrlist struct{}
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_file_provider_update_t struct {
-	source      *es_file_t
-	target_path es_string_token_t
+type Es_event_file_provider_update_t struct {
+	source      *Es_file_t
+	target_path Es_string_token_t
 	reserved    [64]uint8
 }
 
-type es_event_file_provider_materialize_t struct {
-	instigator *es_process_t
-	source     *es_file_t
-	target     *es_file_t
+type Es_event_file_provider_materialize_t struct {
+	instigator *Es_process_t
+	source     *Es_file_t
+	target     *Es_file_t
 	reserved   [64]uint8
 }
 
-type es_event_readlink_t struct {
-	source   *es_file_t
+type Es_event_readlink_t struct {
+	source   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_lookup_t struct {
-	source_dir      *es_file_t
-	relative_target es_string_token_t
+type Es_event_lookup_t struct {
+	source_dir      *Es_file_t
+	relative_target Es_string_token_t
 	reserved        [64]uint8
 }
 
-type es_event_access_t struct {
+type Es_event_access_t struct {
 	mode     int32
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_utimes_t struct {
-	target   *es_file_t
+type Es_event_utimes_t struct {
+	target   *Es_file_t
 	atime    struct{}
 	mtime    struct{}
 	reserved [64]uint8
 }
 
-type es_event_clone_t struct {
-	source      *es_file_t
-	target_file *es_file_t
-	target_dir  *es_file_t
-	target_name es_string_token_t
+type Es_event_clone_t struct {
+	source      *Es_file_t
+	target_file *Es_file_t
+	target_dir  *Es_file_t
+	target_name Es_string_token_t
 	mode        uint32
 	flags       int32
 	reserved    [56]uint8
 }
 
-type es_event_copyfile_t struct {
-	source      *es_file_t
-	target_file *es_file_t
-	target_dir  *es_file_t
-	target_name es_string_token_t
+type Es_event_copyfile_t struct {
+	source      *Es_file_t
+	target_file *Es_file_t
+	target_dir  *Es_file_t
+	target_name Es_string_token_t
 	mode        uint32
 	flags       int32
 	reserved    [56]uint8
 }
 
-type es_event_fcntl_t struct {
-	target   *es_file_t
+type Es_event_fcntl_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_readdir_t struct {
-	target   *es_file_t
+type Es_event_readdir_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_fsgetpath_t struct {
-	target   *es_file_t
+type Es_event_fsgetpath_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_settime_t struct {
+type Es_event_settime_t struct {
 	reserved [64]uint8
 }
 
-type es_event_dup_t struct {
-	target   *es_file_t
+type Es_event_dup_t struct {
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_event_uipc_bind_t struct {
-	dir      *es_file_t
-	filename es_string_token_t
+type Es_event_uipc_bind_t struct {
+	dir      *Es_file_t
+	filename Es_string_token_t
 	mode     uint32
 	reserved [64]uint8
 }
 
-type es_event_uipc_connect_t struct {
-	target   *es_file_t
+type Es_event_uipc_connect_t struct {
+	target   *Es_file_t
 	domain   int
 	type_    int
 	protocol int
 	reserved [64]uint8
 }
 
-type es_event_setacl_t struct {
-	target       *es_file_t
-	set_or_clear es_set_or_clear_t
+type Es_event_setacl_t struct {
+	target       *Es_file_t
+	set_or_clear Es_set_or_clear_t
 	acl          struct{}
 	reserved     [64]uint8
 }
 
-type es_event_pty_grant_t struct {
+type Es_event_pty_grant_t struct {
 	dev      uint32
 	reserved [64]uint8
 }
 
-type es_event_pty_close_t struct {
+type Es_event_pty_close_t struct {
 	dev      uint32
 	reserved [64]uint8
 }
 
-type es_event_proc_check_t struct {
-	target   *es_process_t
-	type_    es_proc_check_type_t
+type Es_event_proc_check_t struct {
+	target   *Es_process_t
+	type_    Es_proc_check_type_t
 	flavor   int
 	reserved [64]uint8
 }
 
-type es_event_searchfs_t struct {
+type Es_event_searchfs_t struct {
 	attrlist struct{}
-	target   *es_file_t
+	target   *Es_file_t
 	reserved [64]uint8
 }
 
-type es_proc_suspend_resume_type_t int
+type Es_proc_suspend_resume_type_t int
 
 const (
-	ES_PROC_SUSPEND_RESUME_TYPE_SUSPEND es_proc_suspend_resume_type_t = iota
+	ES_PROC_SUSPEND_RESUME_TYPE_SUSPEND Es_proc_suspend_resume_type_t = iota
 	ES_PROC_SUSPEND_RESUME_TYPE_RESUME
 	ES_PROC_SUSPEND_RESUME_TYPE_SHUTDOWN_SOCKETS
 )
 
-type es_event_proc_suspend_resume_t struct {
-	target   *es_process_t
-	type_    es_proc_suspend_resume_type_t
+type Es_event_proc_suspend_resume_t struct {
+	target   *Es_process_t
+	type_    Es_proc_suspend_resume_type_t
 	reserved [64]uint8
 }
 
-type es_event_cs_invalidated_t struct {
+type Es_event_cs_invalidated_t struct {
 	reserved [64]uint8
 }
 
-type es_event_trace_t struct {
-	target   *es_process_t
+type Es_event_trace_t struct {
+	target   *Es_process_t
 	reserved [64]uint8
 }
 
-type es_event_remote_thread_create_t struct {
-	target       *es_process_t
-	thread_state *es_thread_state_t
+type Es_event_remote_thread_create_t struct {
+	target       *Es_process_t
+	thread_state *Es_thread_state_t
 	reserved     [64]uint8
 }
 
-type es_event_setuid_t struct {
+type Es_event_setuid_t struct {
 	uid      uint32
 	reserved [64]uint8
 }
 
-type es_event_setgid_t struct {
+type Es_event_setgid_t struct {
 	gid      uint32
 	reserved [64]uint8
 }
 
-type es_event_seteuid_t struct {
+type Es_event_seteuid_t struct {
 	euid     uint32
 	reserved [64]uint8
 }
 
-type es_event_setegid_t struct {
+type Es_event_setegid_t struct {
 	egid     uint32
 	reserved [64]uint8
 }
 
-type es_event_setreuid_t struct {
+type Es_event_setreuid_t struct {
 	ruid     uint32
 	euid     uint32
 	reserved [64]uint8
 }
 
-type es_event_setregid_t struct {
+type Es_event_setregid_t struct {
 	rgid     uint32
 	egid     uint32
 	reserved [64]uint8
 }
 
-type es_event_authentication_od_t struct {
-	instigator  *es_process_t
-	record_type es_string_token_t
-	record_name es_string_token_t
-	node_name   es_string_token_t
-	db_path     es_string_token_t
+type Es_event_authentication_od_t struct {
+	instigator  *Es_process_t
+	record_type Es_string_token_t
+	record_name Es_string_token_t
+	node_name   Es_string_token_t
+	db_path     Es_string_token_t
 }
 
-type es_touchid_mode_t int
+type Es_touchid_mode_t int
 
 const (
-	ES_TOUCHID_MODE_VERIFICATION es_touchid_mode_t = iota
+	ES_TOUCHID_MODE_VERIFICATION Es_touchid_mode_t = iota
 	ES_TOUCHID_MODE_IDENTIFICATION
 )
 
-type es_event_authentication_touchid_t struct {
-	instigator   *es_process_t
-	touchid_mode es_touchid_mode_t
+type Es_event_authentication_touchid_t struct {
+	instigator   *Es_process_t
+	touchid_mode Es_touchid_mode_t
 	has_uid      bool
 	uid          uint32
 }
 
-type es_event_authentication_token_t struct {
-	instigator         *es_process_t
-	pubkey_hash        es_string_token_t
-	token_id           es_string_token_t
-	kerberos_principal es_string_token_t
+type Es_event_authentication_token_t struct {
+	instigator         *Es_process_t
+	pubkey_hash        Es_string_token_t
+	token_id           Es_string_token_t
+	kerberos_principal Es_string_token_t
 }
 
-type es_auto_unlock_type_t int
+type Es_auto_unlock_type_t int
 
 const (
-	ES_AUTO_UNLOCK_MACHINE_UNLOCK es_auto_unlock_type_t = iota + 1
+	ES_AUTO_UNLOCK_MACHINE_UNLOCK Es_auto_unlock_type_t = iota + 1
 	ES_AUTO_UNLOCK_AUTH_PROMPT
 )
 
-type es_event_authentication_auto_unlock_t struct {
+type Es_event_authentication_auto_unlock_t struct {
 	username string
-	typ      es_auto_unlock_type_t
+	typ      Es_auto_unlock_type_t
 }
 
-type es_event_authentication_t struct {
+type Es_event_authentication_t struct {
 	success bool
-	typ     es_authentication_type_t
+	typ     Es_authentication_type_t
 	data    struct {
-		od          *es_event_authentication_od_t
-		touchid     *es_event_authentication_touchid_t
-		token       *es_event_authentication_token_t
-		auto_unlock *es_event_authentication_auto_unlock_t
+		od          *Es_event_authentication_od_t
+		touchid     *Es_event_authentication_touchid_t
+		token       *Es_event_authentication_token_t
+		auto_unlock *Es_event_authentication_auto_unlock_t
 	}
 }
 
-type es_event_xp_malware_detected_t struct {
-	signature_version   es_string_token_t
-	malware_identifier  es_string_token_t
-	incident_identifier es_string_token_t
-	detected_path       es_string_token_t
+type Es_event_xp_malware_detected_t struct {
+	signature_version   Es_string_token_t
+	malware_identifier  Es_string_token_t
+	incident_identifier Es_string_token_t
+	detected_path       Es_string_token_t
 }
 
-type es_event_xp_malware_remediated_t struct {
-	signature_version              es_string_token_t
-	malware_identifier             es_string_token_t
-	incident_identifier            es_string_token_t
-	action_type                    es_string_token_t
+type Es_event_xp_malware_remediated_t struct {
+	signature_version              Es_string_token_t
+	malware_identifier             Es_string_token_t
+	incident_identifier            Es_string_token_t
+	action_type                    Es_string_token_t
 	success                        bool
-	result_description             es_string_token_t
-	remediated_path                es_string_token_t
+	result_description             Es_string_token_t
+	remediated_path                Es_string_token_t
 	remediated_process_audit_token *audit_token_t
 }
 
-type es_graphical_session_id_t uint32
+type Es_graphical_session_id_t uint32
 
-type es_event_lw_session_login_t struct {
-	username             es_string_token_t
-	graphical_session_id es_graphical_session_id_t
+type Es_event_lw_session_login_t struct {
+	username             Es_string_token_t
+	graphical_session_id Es_graphical_session_id_t
 }
 
-type es_event_lw_session_logout_t struct {
-	username             es_string_token_t
-	graphical_session_id es_graphical_session_id_t
+type Es_event_lw_session_logout_t struct {
+	username             Es_string_token_t
+	graphical_session_id Es_graphical_session_id_t
 }
 
-type es_event_lw_session_lock_t struct {
-	username             es_string_token_t
-	graphical_session_id es_graphical_session_id_t
+type Es_event_lw_session_lock_t struct {
+	username             Es_string_token_t
+	graphical_session_id Es_graphical_session_id_t
 }
 
-type es_event_lw_session_unlock_t struct {
-	username             es_string_token_t
-	graphical_session_id es_graphical_session_id_t
+type Es_event_lw_session_unlock_t struct {
+	username             Es_string_token_t
+	graphical_session_id Es_graphical_session_id_t
 }
 
-type es_event_screensharing_attach_t struct {
+type Es_event_screensharing_attach_t struct {
 	success                 bool
-	source_address_type     es_address_type_t
-	source_address          es_string_token_t
-	viewer_appleid          es_string_token_t
-	authentication_type     es_string_token_t
-	authentication_username es_string_token_t
-	session_username        es_string_token_t
+	source_address_type     Es_address_type_t
+	source_address          Es_string_token_t
+	viewer_appleid          Es_string_token_t
+	authentication_type     Es_string_token_t
+	authentication_username Es_string_token_t
+	session_username        Es_string_token_t
 	existing_session        bool
-	graphical_session_id    es_graphical_session_id_t
+	graphical_session_id    Es_graphical_session_id_t
 }
 
-type es_event_screensharing_detach_t struct {
-	source_address_type  es_address_type_t
-	source_address       es_string_token_t
-	viewer_appleid       es_string_token_t
-	graphical_session_id es_graphical_session_id_t
+type Es_event_screensharing_detach_t struct {
+	source_address_type  Es_address_type_t
+	source_address       Es_string_token_t
+	viewer_appleid       Es_string_token_t
+	graphical_session_id Es_graphical_session_id_t
 }
 
-type es_openssh_login_result_type_t int
+type Es_openssh_login_result_type_t int
 
 const (
-	ES_OPENSSH_LOGIN_EXCEED_MAXTRIES es_openssh_login_result_type_t = iota
+	ES_OPENSSH_LOGIN_EXCEED_MAXTRIES Es_openssh_login_result_type_t = iota
 	ES_OPENSSH_LOGIN_ROOT_DENIED
 	ES_OPENSSH_AUTH_SUCCESS
 	ES_OPENSSH_AUTH_FAIL_NONE
@@ -1202,69 +1202,69 @@ const (
 	ES_OPENSSH_INVALID_USER
 )
 
-type es_event_openssh_login_t struct {
+type Es_event_openssh_login_t struct {
 	success             bool
-	result_type         es_openssh_login_result_type_t
-	source_address_type es_address_type_t
-	source_address      es_string_token_t
-	username            es_string_token_t
+	result_type         Es_openssh_login_result_type_t
+	source_address_type Es_address_type_t
+	source_address      Es_string_token_t
+	username            Es_string_token_t
 	has_uid             bool
 	uid                 uint32
 }
 
-type es_event_openssh_logout_t struct {
+type Es_event_openssh_logout_t struct {
 	success             bool
-	result_type         es_openssh_login_result_type_t
-	source_address_type es_address_type_t
-	source_address      es_string_token_t
-	username            es_string_token_t
+	result_type         Es_openssh_login_result_type_t
+	source_address_type Es_address_type_t
+	source_address      Es_string_token_t
+	username            Es_string_token_t
 	uid                 uint32
 }
 
-type es_event_login_login_t struct {
+type Es_event_login_login_t struct {
 	success         bool
-	failure_message es_string_token_t
-	username        es_string_token_t
+	failure_message Es_string_token_t
+	username        Es_string_token_t
 	has_uid         bool
 	uid             uint32
 }
 
-type es_event_login_logout_t struct {
-	username es_string_token_t
+type Es_event_login_logout_t struct {
+	username Es_string_token_t
 	uid      uint32
 }
 
-type es_event_btm_launch_item_add_t struct {
-	instigator *es_process_t
+type Es_event_btm_launch_item_add_t struct {
+	instigator *Es_process_t
 	is_update  bool
-	profile    *es_profile_t
+	profile    *Es_profile_t
 }
 
-type es_event_btm_launch_item_remove_t struct {
-	instigator *es_process_t
-	app        *es_process_t
-	item       *es_btm_launch_item_t
+type Es_event_btm_launch_item_remove_t struct {
+	instigator *Es_process_t
+	app        *Es_process_t
+	item       *Es_btm_launch_item_t
 }
 
-type es_event_su_t struct {
+type Es_event_su_t struct {
 	success         bool
-	failure_message es_string_token_t
+	failure_message Es_string_token_t
 	from_uid        uint32
-	from_username   es_string_token_t
+	from_username   Es_string_token_t
 	has_to_uid      bool
 	to_uid          uint32
-	to_username     es_string_token_t
-	shell           es_string_token_t
+	to_username     Es_string_token_t
+	shell           Es_string_token_t
 	argc            int
-	argv            []es_string_token_t
+	argv            []Es_string_token_t
 	env_count       int
-	env             []es_string_token_t
+	env             []Es_string_token_t
 }
 
-type es_sudo_plugin_type_t int
+type Es_sudo_plugin_type_t int
 
 const (
-	ES_SUDO_PLUGIN_TYPE_UNKNOWN es_sudo_plugin_type_t = iota
+	ES_SUDO_PLUGIN_TYPE_UNKNOWN Es_sudo_plugin_type_t = iota
 	ES_SUDO_PLUGIN_TYPE_FRONT_END
 	ES_SUDO_PLUGIN_TYPE_POLICY
 	ES_SUDO_PLUGIN_TYPE_IO
@@ -1272,442 +1272,442 @@ const (
 	ES_SUDO_PLUGIN_TYPE_APPROVAL
 )
 
-type es_sudo_reject_info_t struct {
-	plugin_name     es_string_token_t
-	plugin_type     es_sudo_plugin_type_t
-	failure_message es_string_token_t
+type Es_sudo_reject_info_t struct {
+	plugin_name     Es_string_token_t
+	plugin_type     Es_sudo_plugin_type_t
+	failure_message Es_string_token_t
 }
 
-type es_event_sudo_t struct {
+type Es_event_sudo_t struct {
 	success       bool
-	reject_info   *es_sudo_reject_info_t
+	reject_info   *Es_sudo_reject_info_t
 	from_uid      uint32
-	from_username es_string_token_t
+	from_username Es_string_token_t
 	has_to_uid    bool
 	to_uid        uint32
-	to_username   es_string_token_t
-	command       es_string_token_t
+	to_username   Es_string_token_t
+	command       Es_string_token_t
 }
 
-type es_event_profile_add_t struct {
-	instigator *es_process_t
+type Es_event_profile_add_t struct {
+	instigator *Es_process_t
 	is_update  bool
-	profile    *es_profile_t
+	profile    *Es_profile_t
 }
 
-type es_event_profile_remove_t struct {
-	instigator *es_process_t
-	profile    *es_profile_t
+type Es_event_profile_remove_t struct {
+	instigator *Es_process_t
+	profile    *Es_profile_t
 }
 
-type es_event_authorization_petition_t struct {
-	instigator *es_process_t
-	petitioner *es_process_t
+type Es_event_authorization_petition_t struct {
+	instigator *Es_process_t
+	petitioner *Es_process_t
 	flags      uint32
-	rights     []es_string_token_t
+	rights     []Es_string_token_t
 }
 
-type es_authorization_result_t struct {
+type Es_authorization_result_t struct {
 	right_name string
-	rule_class es_authorization_rule_class_t
+	rule_class Es_authorization_rule_class_t
 	granted    bool
 }
 
-type es_event_authorization_judgement_t struct {
-	instigator  *es_process_t
-	petitioner  *es_process_t
+type Es_event_authorization_judgement_t struct {
+	instigator  *Es_process_t
+	petitioner  *Es_process_t
 	return_code int
-	results     []es_authorization_result_t
+	results     []Es_authorization_result_t
 }
 
-type es_od_member_id_t struct {
-	member_type es_od_member_type_t
+type Es_od_member_id_t struct {
+	member_type Es_od_member_type_t
 	uuid        uuid_t
-	name        es_string_token_t
+	name        Es_string_token_t
 }
 
-type es_event_od_group_add_t struct {
-	instigator *es_process_t
+type Es_event_od_group_add_t struct {
+	instigator *Es_process_t
 	error_code int
-	group_name es_string_token_t
-	member     *es_od_member_id_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	group_name Es_string_token_t
+	member     *Es_od_member_id_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_group_remove_t struct {
-	instigator *es_process_t
+type Es_event_od_group_remove_t struct {
+	instigator *Es_process_t
 	error_code int
-	group_name es_string_token_t
-	member     *es_od_member_id_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	group_name Es_string_token_t
+	member     *Es_od_member_id_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_od_member_id_array_t struct {
-	member_type  es_od_member_type_t
+type Es_od_member_id_array_t struct {
+	member_type  Es_od_member_type_t
 	member_count int
 	uuid         uuid_t
-	name         es_string_token_t
+	name         Es_string_token_t
 }
 
-type es_event_od_group_set_t struct {
-	instigator *es_process_t
+type Es_event_od_group_set_t struct {
+	instigator *Es_process_t
 	error_code int
-	group_name es_string_token_t
-	members    *es_od_member_id_array_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	group_name Es_string_token_t
+	members    *Es_od_member_id_array_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_modify_password_t struct {
-	instigator   *es_process_t
+type Es_event_od_modify_password_t struct {
+	instigator   *Es_process_t
 	error_code   int
-	account_type es_od_account_type_t
-	account_name es_string_token_t
-	node_name    es_string_token_t
-	db_path      es_string_token_t
+	account_type Es_od_account_type_t
+	account_name Es_string_token_t
+	node_name    Es_string_token_t
+	db_path      Es_string_token_t
 }
 
-type es_event_od_disable_user_t struct {
-	instigator *es_process_t
+type Es_event_od_disable_user_t struct {
+	instigator *Es_process_t
 	error_code int
-	user_name  es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	user_name  Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_enable_user_t struct {
-	instigator *es_process_t
+type Es_event_od_enable_user_t struct {
+	instigator *Es_process_t
 	error_code int
-	user_name  es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	user_name  Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_attribute_value_add_t struct {
-	instigator      *es_process_t
+type Es_event_od_attribute_value_add_t struct {
+	instigator      *Es_process_t
 	error_code      int
-	record_type     es_od_record_type_t
-	record_name     es_string_token_t
-	attribute_name  es_string_token_t
-	attribute_value es_string_token_t
-	node_name       es_string_token_t
-	db_path         es_string_token_t
+	record_type     Es_od_record_type_t
+	record_name     Es_string_token_t
+	attribute_name  Es_string_token_t
+	attribute_value Es_string_token_t
+	node_name       Es_string_token_t
+	db_path         Es_string_token_t
 }
 
-type es_event_od_attribute_value_remove_t struct {
-	instigator      *es_process_t
+type Es_event_od_attribute_value_remove_t struct {
+	instigator      *Es_process_t
 	error_code      int
-	record_type     es_od_record_type_t
-	record_name     es_string_token_t
-	attribute_name  es_string_token_t
-	attribute_value es_string_token_t
-	node_name       es_string_token_t
-	db_path         es_string_token_t
+	record_type     Es_od_record_type_t
+	record_name     Es_string_token_t
+	attribute_name  Es_string_token_t
+	attribute_value Es_string_token_t
+	node_name       Es_string_token_t
+	db_path         Es_string_token_t
 }
 
-type es_event_od_attribute_set_t struct {
-	instigator       *es_process_t
+type Es_event_od_attribute_set_t struct {
+	instigator       *Es_process_t
 	error_code       int
-	record_type      es_od_record_type_t
-	record_name      es_string_token_t
-	attribute_name   es_string_token_t
-	attribute_values []es_string_token_t
-	node_name        es_string_token_t
-	db_path          es_string_token_t
+	record_type      Es_od_record_type_t
+	record_name      Es_string_token_t
+	attribute_name   Es_string_token_t
+	attribute_values []Es_string_token_t
+	node_name        Es_string_token_t
+	db_path          Es_string_token_t
 }
 
-type es_event_od_create_user_t struct {
-	instigator *es_process_t
+type Es_event_od_create_user_t struct {
+	instigator *Es_process_t
 	error_code int
-	user_name  es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	user_name  Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_create_group_t struct {
-	instigator *es_process_t
+type Es_event_od_create_group_t struct {
+	instigator *Es_process_t
 	error_code int
-	group_name es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	group_name Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_delete_user_t struct {
-	instigator *es_process_t
+type Es_event_od_delete_user_t struct {
+	instigator *Es_process_t
 	error_code int
-	user_name  es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	user_name  Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_od_delete_group_t struct {
-	instigator *es_process_t
+type Es_event_od_delete_group_t struct {
+	instigator *Es_process_t
 	error_code int
-	group_name es_string_token_t
-	node_name  es_string_token_t
-	db_path    es_string_token_t
+	group_name Es_string_token_t
+	node_name  Es_string_token_t
+	db_path    Es_string_token_t
 }
 
-type es_event_xpc_connect_t struct {
-	service_name        es_string_token_t
-	service_domain_type es_xpc_domain_type_t
+type Es_event_xpc_connect_t struct {
+	service_name        Es_string_token_t
+	service_domain_type Es_xpc_domain_type_t
 }
 
-type es_events_t struct {
-	access                    es_event_access_t
-	chdir                     es_event_chdir_t
-	chroot                    es_event_chroot_t
-	clone                     es_event_clone_t
-	close                     es_event_close_t
-	copyfile                  es_event_copyfile_t
-	create                    es_event_create_t
-	cs_invalidated            es_event_cs_invalidated_t
-	deleteextattr             es_event_deleteextattr_t
-	dup                       es_event_dup_t
-	exchangedata              es_event_exchangedata_t
-	exec                      es_event_exec_t
-	exit                      es_event_exit_t
-	file_provider_materialize es_event_file_provider_materialize_t
-	file_provider_update      es_event_file_provider_update_t
-	fcntl                     es_event_fcntl_t
-	fork                      es_event_fork_t
-	fsgetpath                 es_event_fsgetpath_t
-	get_task                  es_event_get_task_t
-	get_task_read             es_event_get_task_read_t
-	get_task_inspect          es_event_get_task_inspect_t
-	get_task_name             es_event_get_task_name_t
-	getattrlist               es_event_getattrlist_t
-	getextattr                es_event_getextattr_t
-	iokit_open                es_event_iokit_open_t
-	kextload                  es_event_kextload_t
-	kextunload                es_event_kextunload_t
-	link                      es_event_link_t
-	listextattr               es_event_listextattr_t
-	lookup                    es_event_lookup_t
-	mmap                      es_event_mmap_t
-	mount                     es_event_mount_t
-	mprotect                  es_event_mprotect_t
-	open                      es_event_open_t
-	proc_check                es_event_proc_check_t
-	proc_suspend_resume       es_event_proc_suspend_resume_t
-	pty_close                 es_event_pty_close_t
-	pty_grant                 es_event_pty_grant_t
-	readdir                   es_event_readdir_t
-	readlink                  es_event_readlink_t
-	remote_thread_create      es_event_remote_thread_create_t
-	remount                   es_event_remount_t
-	rename                    es_event_rename_t
-	searchfs                  es_event_searchfs_t
-	setacl                    es_event_setacl_t
-	setattrlist               es_event_setattrlist_t
-	setextattr                es_event_setextattr_t
-	setflags                  es_event_setflags_t
-	setmode                   es_event_setmode_t
-	setowner                  es_event_setowner_t
-	settime                   es_event_settime_t
-	setuid                    es_event_setuid_t
-	setgid                    es_event_setgid_t
-	seteuid                   es_event_seteuid_t
-	setegid                   es_event_setegid_t
-	setreuid                  es_event_setreuid_t
-	setregid                  es_event_setregid_t
-	signal                    es_event_signal_t
-	stat                      es_event_stat_t
-	trace                     es_event_trace_t
-	truncate                  es_event_truncate_t
-	uipc_bind                 es_event_uipc_bind_t
-	uipc_connect              es_event_uipc_connect_t
-	unlink                    es_event_unlink_t
-	unmount                   es_event_unmount_t
-	utimes                    es_event_utimes_t
-	write                     es_event_write_t
-	authentication            *es_event_authentication_t
-	xp_malware_detected       *es_event_xp_malware_detected_t
-	xp_malware_remediated     *es_event_xp_malware_remediated_t
-	lw_session_login          *es_event_lw_session_login_t
-	lw_session_logout         *es_event_lw_session_logout_t
-	lw_session_lock           *es_event_lw_session_lock_t
-	lw_session_unlock         *es_event_lw_session_unlock_t
-	screensharing_attach      *es_event_screensharing_attach_t
-	screensharing_detach      *es_event_screensharing_detach_t
-	openssh_login             *es_event_openssh_login_t
-	openssh_logout            *es_event_openssh_logout_t
-	login_login               *es_event_login_login_t
-	login_logout              *es_event_login_logout_t
-	btm_launch_item_add       *es_event_btm_launch_item_add_t
-	btm_launch_item_remove    *es_event_btm_launch_item_remove_t
-	profile_add               *es_event_profile_add_t
-	profile_remove            *es_event_profile_remove_t
-	su                        *es_event_su_t
-	authorization_petition    *es_event_authorization_petition_t
-	authorization_judgement   *es_event_authorization_judgement_t
-	sudo                      *es_event_sudo_t
-	od_group_add              *es_event_od_group_add_t
-	od_group_remove           *es_event_od_group_remove_t
-	od_group_set              *es_event_od_group_set_t
-	od_modify_password        *es_event_od_modify_password_t
-	od_disable_user           *es_event_od_disable_user_t
-	od_enable_user            *es_event_od_enable_user_t
-	od_attribute_value_add    *es_event_od_attribute_value_add_t
-	od_attribute_value_remove *es_event_od_attribute_value_remove_t
-	od_attribute_set          *es_event_od_attribute_set_t
-	od_create_user            *es_event_od_create_user_t
-	od_create_group           *es_event_od_create_group_t
-	od_delete_user            *es_event_od_delete_user_t
-	od_delete_group           *es_event_od_delete_group_t
-	xpc_connect               *es_event_xpc_connect_t
+type Es_events_t struct {
+	access                    Es_event_access_t
+	chdir                     Es_event_chdir_t
+	chroot                    Es_event_chroot_t
+	clone                     Es_event_clone_t
+	close                     Es_event_close_t
+	copyfile                  Es_event_copyfile_t
+	create                    Es_event_create_t
+	cs_invalidated            Es_event_cs_invalidated_t
+	deleteextattr             Es_event_deleteextattr_t
+	dup                       Es_event_dup_t
+	exchangedata              Es_event_exchangedata_t
+	exec                      Es_event_exec_t
+	exit                      Es_event_exit_t
+	file_provider_materialize Es_event_file_provider_materialize_t
+	file_provider_update      Es_event_file_provider_update_t
+	fcntl                     Es_event_fcntl_t
+	fork                      Es_event_fork_t
+	fsgetpath                 Es_event_fsgetpath_t
+	get_task                  Es_event_get_task_t
+	get_task_read             Es_event_get_task_read_t
+	get_task_inspect          Es_event_get_task_inspect_t
+	get_task_name             Es_event_get_task_name_t
+	getattrlist               Es_event_getattrlist_t
+	getextattr                Es_event_getextattr_t
+	iokit_open                Es_event_iokit_open_t
+	kextload                  Es_event_kextload_t
+	kextunload                Es_event_kextunload_t
+	link                      Es_event_link_t
+	listextattr               Es_event_listextattr_t
+	lookup                    Es_event_lookup_t
+	mmap                      Es_event_mmap_t
+	mount                     Es_event_mount_t
+	mprotect                  Es_event_mprotect_t
+	open                      Es_event_open_t
+	proc_check                Es_event_proc_check_t
+	proc_suspend_resume       Es_event_proc_suspend_resume_t
+	pty_close                 Es_event_pty_close_t
+	pty_grant                 Es_event_pty_grant_t
+	readdir                   Es_event_readdir_t
+	readlink                  Es_event_readlink_t
+	remote_thread_create      Es_event_remote_thread_create_t
+	remount                   Es_event_remount_t
+	rename                    Es_event_rename_t
+	searchfs                  Es_event_searchfs_t
+	setacl                    Es_event_setacl_t
+	setattrlist               Es_event_setattrlist_t
+	setextattr                Es_event_setextattr_t
+	setflags                  Es_event_setflags_t
+	setmode                   Es_event_setmode_t
+	setowner                  Es_event_setowner_t
+	settime                   Es_event_settime_t
+	setuid                    Es_event_setuid_t
+	setgid                    Es_event_setgid_t
+	seteuid                   Es_event_seteuid_t
+	setegid                   Es_event_setegid_t
+	setreuid                  Es_event_setreuid_t
+	setregid                  Es_event_setregid_t
+	signal                    Es_event_signal_t
+	stat                      Es_event_stat_t
+	trace                     Es_event_trace_t
+	truncate                  Es_event_truncate_t
+	uipc_bind                 Es_event_uipc_bind_t
+	uipc_connect              Es_event_uipc_connect_t
+	unlink                    Es_event_unlink_t
+	unmount                   Es_event_unmount_t
+	utimes                    Es_event_utimes_t
+	write                     Es_event_write_t
+	authentication            *Es_event_authentication_t
+	xp_malware_detected       *Es_event_xp_malware_detected_t
+	xp_malware_remediated     *Es_event_xp_malware_remediated_t
+	lw_session_login          *Es_event_lw_session_login_t
+	lw_session_logout         *Es_event_lw_session_logout_t
+	lw_session_lock           *Es_event_lw_session_lock_t
+	lw_session_unlock         *Es_event_lw_session_unlock_t
+	screensharing_attach      *Es_event_screensharing_attach_t
+	screensharing_detach      *Es_event_screensharing_detach_t
+	openssh_login             *Es_event_openssh_login_t
+	openssh_logout            *Es_event_openssh_logout_t
+	login_login               *Es_event_login_login_t
+	login_logout              *Es_event_login_logout_t
+	btm_launch_item_add       *Es_event_btm_launch_item_add_t
+	btm_launch_item_remove    *Es_event_btm_launch_item_remove_t
+	profile_add               *Es_event_profile_add_t
+	profile_remove            *Es_event_profile_remove_t
+	su                        *Es_event_su_t
+	authorization_petition    *Es_event_authorization_petition_t
+	authorization_judgement   *Es_event_authorization_judgement_t
+	sudo                      *Es_event_sudo_t
+	od_group_add              *Es_event_od_group_add_t
+	od_group_remove           *Es_event_od_group_remove_t
+	od_group_set              *Es_event_od_group_set_t
+	od_modify_password        *Es_event_od_modify_password_t
+	od_disable_user           *Es_event_od_disable_user_t
+	od_enable_user            *Es_event_od_enable_user_t
+	od_attribute_value_add    *Es_event_od_attribute_value_add_t
+	od_attribute_value_remove *Es_event_od_attribute_value_remove_t
+	od_attribute_set          *Es_event_od_attribute_set_t
+	od_create_user            *Es_event_od_create_user_t
+	od_create_group           *Es_event_od_create_group_t
+	od_delete_user            *Es_event_od_delete_user_t
+	od_delete_group           *Es_event_od_delete_group_t
+	xpc_connect               *Es_event_xpc_connect_t
 }
 
-type es_result_t struct {
-	result_type es_result_type_t
+type Es_result_t struct {
+	result_type Es_result_type_t
 	result      interface{}
 }
 
-type es_message_t struct {
+type Es_message_t struct {
 	version        uint32
 	time           time.Time
 	mach_time      uint64
 	deadline       uint64
-	process        *es_process_t
+	process        *Es_process_t
 	seq_num        uint64
-	action_type    es_action_type_t
+	action_type    Es_action_type_t
 	action         interface{}
-	event_type     es_event_type_t
-	event          es_events_t
-	thread         *es_thread_t
+	event_type     Es_event_type_t
+	event          Es_events_t
+	thread         *Es_thread_t
 	global_seq_num uint64
 	opaque         []uint64
 }
 
 /**
- * Calculate the size of an es_message_t.
+ * Calculate the size of an Es_message_t.
  *
- * @warning This function MUST NOT be used in conjunction with attempting to copy an es_message_t (e.g.
- * by using the reported size in order to `malloc(3)` a buffer, and `memcpy(3)` an existing es_message_t
+ * @warning This function MUST NOT be used in conjunction with attempting to copy an Es_message_t (e.g.
+ * by using the reported size in order to `malloc(3)` a buffer, and `memcpy(3)` an existing Es_message_t
  * into that buffer). Doing so will result in use-after-free bugs.
  *
- * @deprecated Please use `es_retain_message` to retain an es_message_t.
+ * @deprecated Please use `es_retain_message` to retain an Es_message_t.
  *
  * @param msg The message for which the size will be calculated
  * @return Size of the message
  */
-func es_message_size(msg *es_message_t) uintptr {
+func Es_message_size(msg *Es_message_t) uintptr {
 	return unsafe.Sizeof(*msg)
 }
 
 /**
- * Retains an es_message_t, returning a non-const pointer to the given es_message_t for compatibility with
+ * Retains an Es_message_t, returning a non-const pointer to the given Es_message_t for compatibility with
  * existing code.
  *
- * @warning It is invalid to attempt to write to the returned es_message_t, despite being non-const, and
+ * @warning It is invalid to attempt to write to the returned Es_message_t, despite being non-const, and
  * doing so will result in a crash.
  *
- * @deprecated Use es_retain_message to retain a message.
+ * @deprecated Use Es_retain_message to retain a message.
  *
  * @param msg The message to be retained
- * @return non-const pointer to the retained es_message_t.
+ * @return non-const pointer to the retained Es_message_t.
  *
  * @brief The caller must release the memory with `es_free_message`
  */
-func es_copy_message(msg *es_message_t) *es_message_t {
+func Es_copy_message(msg *Es_message_t) *Es_message_t {
 	return msg
 }
 
 /**
- * Releases the memory associated with the given es_message_t that was retained via `es_copy_message`
+ * Releases the memory associated with the given Es_message_t that was retained via `es_copy_message`
  *
  * @deprecated Use `es_release_message` to release a message.
  *
  * @param msg The message to be released
  */
-func es_free_message(msg *es_message_t) {
+func Es_free_message(msg *Es_message_t) {
 	// free message
 }
 
 /**
- * Retains the given es_message_t, extending its lifetime until released with `es_release_message`.
+ * Retains the given Es_message_t, extending its lifetime until released with `es_release_message`.
  *
  * @param msg The message to be retained
  *
- * @note It is necessary to retain a message when the es_message_t provided in the event handler block of
+ * @note It is necessary to retain a message when the Es_message_t provided in the event handler block of
  * `es_new_client` will be processed asynchronously.
  */
-func es_retain_message(msg *es_message_t) {
+func Es_retain_message(msg *Es_message_t) {
 	// retain message
 }
 
 /**
- * Releases the given es_message_t that was previously retained with `es_retain_message`
+ * Releases the given Es_message_t that was previously retained with `es_retain_message`
  *
  * @param msg The message to be released
  */
-func es_release_message(msg *es_message_t) {
+func Es_release_message(msg *Es_message_t) {
 	// release message
 }
 
 /**
- * Get the number of arguments in a message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the number of arguments in a message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @return The number of arguments
  */
-func es_exec_arg_count(event *es_event_exec_t) uint32 {
+func Es_exec_arg_count(event *Es_event_exec_t) uint32 {
 	return 0
 }
 
 /**
- * Get the number of environment variables in a message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the number of environment variables in a message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @return The number of environment variables
  */
-func es_exec_env_count(event *es_event_exec_t) uint32 {
+func Es_exec_env_count(event *Es_event_exec_t) uint32 {
 	return 0
 }
 
 /**
- * Get the number of file descriptors in a message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the number of file descriptors in a message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @return The number of file descriptors
  */
-func es_exec_fd_count(event *es_event_exec_t) uint32 {
+func Es_exec_fd_count(event *Es_event_exec_t) uint32 {
 	return 0
 }
 
 /**
- * Get the argument at the specified position in the message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the argument at the specified position in the message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @param index Index of the argument to retrieve (starts from 0)
- * @return  es_string_token_t containing a pointer to the argument and its length.
+ * @return  Es_string_token_t containing a pointer to the argument and its length.
  *          This is a zero-allocation operation. The returned pointer must not outlive exec_event.
  * @brief Reading an an argument where `index` >= `es_exec_arg_count()` is undefined
  */
-func es_exec_arg(event *es_event_exec_t, index uint32) es_string_token_t {
-	return es_string_token_t{}
+func Es_exec_arg(event *Es_event_exec_t, index uint32) Es_string_token_t {
+	return Es_string_token_t{}
 }
 
 /**
- * Get the environment variable at the specified position in the message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the environment variable at the specified position in the message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @param index Index of the environment variable to retrieve (starts from 0)
- * @return  es_string_token_t containing a pointer to the environment variable and its length.
+ * @return  Es_string_token_t containing a pointer to the environment variable and its length.
  *          This is zero-allocation operation. The returned pointer must not outlive exec_event.
  * @brief Reading an an env where `index` >= `es_exec_env_count()` is undefined
  */
-func es_exec_env(event *es_event_exec_t, index uint32) es_string_token_t {
-	return es_string_token_t{}
+func Es_exec_env(event *Es_event_exec_t, index uint32) Es_string_token_t {
+	return Es_string_token_t{}
 }
 
 /**
- * Get the file descriptor at the specified position in the message containing an es_event_exec_t
- * @param event The es_event_exec_t being inspected
+ * Get the file descriptor at the specified position in the message containing an Es_event_exec_t
+ * @param event The Es_event_exec_t being inspected
  * @param index Index of the file descriptor to retrieve (starts from 0)
- * @return Pointer to es_fd_t describing the file descriptor.
+ * @return Pointer to Es_fd_t describing the file descriptor.
  *         This is zero-allocation operation. The returned pointer must not outlive exec_event.
  * @note Reading an fd where `index` >= `es_exec_fd_count()` is undefined
  */
-func es_exec_fd(event *es_event_exec_t, index uint32) *es_fd_t {
+func Es_exec_fd(event *Es_event_exec_t, index uint32) *Es_fd_t {
 	return &es_fd_t{}
 }
 
-// TODO typedef struct statfs es_statfs_t;
+// TODO typedef struct statfs Es_statfs_t;

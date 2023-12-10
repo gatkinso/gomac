@@ -3,7 +3,7 @@ package endpointsecurity
 type Es_client_t struct{}
 
 /**
- * es_handler_block_t The type of block that will be invoked to handled messages from the ES subsystem
+ * Es_handler_block_t The type of block that will be invoked to handled messages from the ES subsystem
  * The es_client_t is a handle to the client being sent the event. It must be passed to any "respond" functions
  * The es_message_t is the message that must be handled
  */

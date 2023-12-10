@@ -276,12 +276,9 @@ const (
 	ES_RESULT_TYPE_FLAGS
 )
 
-/*
-*
-*
-
-	@brief Return value for functions that can only fail in one way
-*/
+/**
+ * @brief Return value for functions that can only fail in one way
+ */
 type Es_return_t int
 
 const (
@@ -289,12 +286,9 @@ const (
 	ES_RETURN_ERROR
 )
 
-/*
-*
-*
-
-	@brief Error conditions for responding to a message
-*/
+/**
+ * @brief Error conditions for responding to a message
+ */
 type Es_respond_result_t int
 
 const (
@@ -312,11 +306,9 @@ const (
 	ES_RESPOND_RESULT_ERR_EVENT_TYPE
 )
 
-/*
-*
-
-	@brief Error conditions for creating a new client
-*/
+/**
+ * @brief Error conditions for creating a new client
+ */
 type Es_new_client_result_t int
 
 const (
@@ -335,11 +327,9 @@ const (
 	ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS
 )
 
-/*
-*
-
-	@brief Error conditions for clearing the authorisation caches
-*/
+/**
+ * @brief Error conditions for clearing the authorisation caches
+ */
 type Es_clear_cache_result_t int
 
 const (

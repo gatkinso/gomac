@@ -1355,49 +1355,131 @@ type Es_event_cs_invalidated_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Fired when one process attempts to attach to another process
+ *
+ * @field target The process that will be attached to by the process
+ * that instigated the event
+ *
+ * @note This event can fire multiple times for a single trace attempt, for example
+ * when the processes to which is being attached is reparented during the operation
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_trace_t struct {
 	target   *Es_process_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has attempted to create a thread in
+ * another process by calling one of the thread_create or thread_create_running
+ * MIG routines.
+ *
+ * @field target The process in which a new thread was created
+ * @field thread_state The new thread state in case of thread_create_running,
+ * NULL in case of thread_create.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_remote_thread_create_t struct {
 	target       *Es_process_t
 	thread_state *Es_thread_state_t
 	reserved     [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called setuid().
+ *
+ * @field uid The uid argument to the setuid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_setuid_t struct {
 	uid      uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called setgid().
+ *
+ * @field gid The gid argument to the setgid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_setgid_t struct {
 	gid      uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called seteuid().
+ *
+ * @field euid The euid argument to the seteuid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_seteuid_t struct {
 	euid     uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called setegid().
+ *
+ * @field egid The egid argument to the setegid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_setegid_t struct {
 	egid     uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called setreuid().
+ *
+ * @field ruid The ruid argument to the setreuid() syscall.
+ * @field euid The euid argument to the setreuid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_setreuid_t struct {
 	ruid     uint32
 	euid     uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Notification that a process has called setregid().
+ *
+ * @field rgid The rgid argument to the setregid() syscall.
+ * @field egid The egid argument to the setregid() syscall.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_setregid_t struct {
 	rgid     uint32
 	egid     uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief OpenDirectory authentication data for type ES_AUTHENTICATION_TYPE_OD.
+ *
+ * @field instigator        Process that instigated the authentication
+ *                          (XPC caller that asked for authentication).
+ * @field record_type       OD record type against which OD is authenticating.
+ *                          Typically "Users", but other record types can auth too.
+ * @field record_name       OD record name against which OD is authenticating.
+ *                          For record type "Users", this is the username.
+ * @field node_name         OD node against which OD is authenticating.
+ *                          Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                          "/Active Directory/<domain>".
+ * @field db_path           Optional.  If node_name is "/Local/Default", this is
+ *                          the path of the database against which OD is
+ *                          authenticating.
+ */
 type Es_event_authentication_od_t struct {
 	instigator  *Es_process_t
 	record_type Es_string_token_t
@@ -1413,6 +1495,18 @@ const (
 	ES_TOUCHID_MODE_IDENTIFICATION
 )
 
+/**
+ * @brief TouchID authentication data for type ES_AUTHENTICATION_TYPE_TOUCHID.
+ *
+ * @field instigator        Process that instigated the authentication
+ *                          (XPC caller that asked for authentication).
+ * @field touchid_mode      TouchID authentication type
+ * @field has_uid           Describes whether or not the uid of the user authenticated is available
+ * @field uid               Union that is valid when `has_uid` is set to `true`
+ * @field uid.uid           uid of user that was authenticated.
+ *                          This will be set when `success` is true and `touchid_mode` is of
+ *                          verification type i.e. ES_TOUCHID_MODE_VERIFICATION
+ */
 type Es_event_authentication_touchid_t struct {
 	instigator   *Es_process_t
 	touchid_mode Es_touchid_mode_t
@@ -1420,6 +1514,16 @@ type Es_event_authentication_touchid_t struct {
 	uid          uint32
 }
 
+/**
+ * @brief Token authentication data for type ES_AUTHENTICATION_TYPE_TOKEN.
+ *
+ * @field instigator        Process that instigated the authentication
+ *                          (XPC caller that asked for authentication).
+ * @field pubkey_hash       Hash of the public key which CryptoTokenKit is authenticating.
+ * @field token_id          Token identifier of the event which CryptoTokenKit is authenticating.
+ * @field kerberos_principal Optional.  This will be available if token is used for GSS PKINIT
+ *                          authentication for obtaining a kerberos TGT.  NULL in all other cases.
+ */
 type Es_event_authentication_token_t struct {
 	instigator         *Es_process_t
 	pubkey_hash        Es_string_token_t
@@ -1434,11 +1538,32 @@ const (
 	ES_AUTO_UNLOCK_AUTH_PROMPT
 )
 
+/**
+ * @brief Auto Unlock authentication data for type ES_AUTHENTICATION_TYPE_TOKEN.
+ *
+ * @field username          Username for which the authentication was attempted.
+ * @field type              Purpose of the authentication.
+ *
+ * @note This kind of authentication is performed when authenticating to the local
+ * Mac using an Apple Watch for the purpose of unlocking the machine or confirming
+ * an authorization prompt.  Auto Unlock is part of Continuity.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_authentication_auto_unlock_t struct {
 	username string
 	typ      Es_auto_unlock_type_t
 }
 
+/**
+ * @brief Notification that an authentication was performed.
+ *
+ * @field success           True iff authentication was successful.
+ * @field type              The type of authentication.
+ * @field data              Type-specific data describing the authentication.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_authentication_t struct {
 	success bool
 	typ     Es_authentication_type_t
@@ -1450,6 +1575,23 @@ type Es_event_authentication_t struct {
 	}
 }
 
+/**
+ * @brief Notification that XProtect detected malware.
+ *
+ * @field signature_version     Version of the signatures used for detection.
+ *                              Currently corresponds to XProtect version.
+ * @field malware_identifier    String identifying the malware that was detected.
+ * @field incident_identifier   String identifying the incident, intended for linking
+ *                              multiple malware detected and remediated events.
+ * @field detected_path         Path where malware was detected.  This path is not
+ *                              necessarily a malicious binary, it can also be a
+ *                              legitimate file containing a malicious portion.
+ *
+ * @note For any given malware incident, XProtect may emit zero or more
+ *       xp_malware_detected events, and zero or more xp_malware_remediated events.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_xp_malware_detected_t struct {
 	signature_version   Es_string_token_t
 	malware_identifier  Es_string_token_t
@@ -1457,6 +1599,31 @@ type Es_event_xp_malware_detected_t struct {
 	detected_path       Es_string_token_t
 }
 
+/**
+ * @brief Notification that XProtect remediated malware.
+ *
+ * @field signature_version     Version of the signatures used for remediation.
+ *                              Currently corresponds to XProtect version.
+ * @field malware_identifier    String identifying the malware that was detected.
+ * @field incident_identifier   String identifying the incident, intended for linking
+ *                              multiple malware detected and remediated events.
+ * @field action_type           String indicating the type of action that was taken,
+ *                              e.g. "path_delete".
+ * @field success               True iff remediation was successful.
+ * @field result_description    String describing specific reasons for failure or success.
+ * @field remediated_path       Optional.  Path that was subject to remediation, if any.
+ *                              This path is not necessarily a malicious binary, it can
+ *                              also be a legitimate file containing a malicious portion.
+ *                              Specifically, the file at this path may still exist after
+ *                              successful remediation.
+ * @field remediated_process_audit_token  Audit token of process that was subject to
+ *                              remediation, if any.
+ *
+ * @note For any given malware incident, XProtect may emit zero or more
+ *       xp_malware_detected events, and zero or more xp_malware_remediated events.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_xp_malware_remediated_t struct {
 	signature_version              Es_string_token_t
 	malware_identifier             Es_string_token_t
@@ -1468,28 +1635,92 @@ type Es_event_xp_malware_remediated_t struct {
 	remediated_process_audit_token *audit_token_t
 }
 
+/**
+ * @brief es_graphical_session_id_t is a session identifier identifying a on-console or off-console graphical session.
+ * A graphical session exists and can potentially be attached to via Screen Sharing before a user is logged in.
+ * EndpointSecurity clients should treat the `graphical_session_id` as an opaque identifier and not assign
+ * special meaning to it beyond correlating events pertaining to the same graphical session.  Not to be confused with the audit session ID.
+ */
 type Es_graphical_session_id_t uint32
 
+/**
+ * @brief Notification that LoginWindow has logged in a user.
+ *
+ * @field username              Short username of the user.
+ * @field graphical_session_id  Graphical session id of the session.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_lw_session_login_t struct {
 	username             Es_string_token_t
 	graphical_session_id Es_graphical_session_id_t
 }
 
+/**
+ * @brief Notification that LoginWindow has logged out a user.
+ *
+ * @field username              Short username of the user.
+ * @field graphical_session_id  Graphical session id of the session.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_lw_session_logout_t struct {
 	username             Es_string_token_t
 	graphical_session_id Es_graphical_session_id_t
 }
 
+/**
+ * @brief Notification that LoginWindow locked the screen of a session.
+ *
+ * @field username              Short username of the user.
+ * @field graphical_session_id  Graphical session id of the session.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_lw_session_lock_t struct {
 	username             Es_string_token_t
 	graphical_session_id Es_graphical_session_id_t
 }
 
+/**
+ * @brief Notification that LoginWindow unlocked the screen of a session.
+ *
+ * @field username              Short username of the user.
+ * @field graphical_session_id  Graphical session id of the session.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_lw_session_unlock_t struct {
 	username             Es_string_token_t
 	graphical_session_id Es_graphical_session_id_t
 }
 
+/**
+ * @brief Notification that Screen Sharing has attached to a graphical session.
+ *
+ * @field success               True iff Screen Sharing successfully attached.
+ * @field source_address_type   Type of source address.
+ * @field source_address        Optional.  Source address of connection, or NULL.
+ *                              Depending on the transport used, the source
+ *                              address may or may not be available.
+ * @field viewer_appleid        Optional.  For screen sharing initiated using an
+ *                              Apple ID (e.g., from Messages or FaceTime), this
+ *                              is the viewer's (client's) Apple ID.  It is not
+ *                              necessarily the Apple ID that invited the screen
+ *                              sharing.  NULL if unavailable.
+ * @field authentication_type   Type of authentication.
+ * @field authentication_username  Optional.  Username used for authentication to
+ *                              Screen Sharing.  NULL if authentication type doesn't
+ *                              use an username (e.g. simple VNC password).
+ * @field session_username      Optional.  Username of the loginwindow session if
+ *                              available,  NULL otherwise.
+ * @field existing_session      True iff there was an existing user session.
+ * @field graphical_session_id  Graphical session id of the screen shared.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @discussion This event is not emitted when a screensharing session has the same source and destination address.
+ * For example if device A is acting as a NAT gateway for device B, then a screensharing session from B -> A would not emit an event.
+ */
 type Es_event_screensharing_attach_t struct {
 	success                 bool
 	source_address_type     Es_address_type_t
@@ -1502,6 +1733,23 @@ type Es_event_screensharing_attach_t struct {
 	graphical_session_id    Es_graphical_session_id_t
 }
 
+/**
+ * @brief Notification that Screen Sharing has detached from a graphical session.
+ *
+ * @field source_address_type   Type of source address.
+ * @field source_address        Optional.  Source address of connection, or NULL.
+ *                              Depending on the transport used, the source
+ *                              address may or may not be available.
+ * @field viewer_appleid        Optional.  For screen sharing initiated using an
+ *                              Apple ID (e.g., from Messages or FaceTime), this
+ *                              is the viewer's (client's) Apple ID.  It is not
+ *                              necessarily the Apple ID that invited the screen
+ *                              sharing.  NULL if unavailable.
+ * @field graphical_session_id  Graphical session id of the screen shared.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @discussion This event is not emitted when a screensharing session has the same source and destination address.
+ */
 type Es_event_screensharing_detach_t struct {
 	source_address_type  Es_address_type_t
 	source_address       Es_string_token_t
@@ -1524,6 +1772,24 @@ const (
 	ES_OPENSSH_INVALID_USER
 )
 
+/**
+ * @brief Notification for OpenSSH login event.
+ *
+ * @field success               True iff login was successful.
+ * @field result_type           Result type for the login attempt.
+ * @field source_address_type   Type of source address.
+ * @field source_address        Source address of connection.
+ * @field username              Username used for login.
+ * @field has_uid               Describes whether or not the uid of the user logged in is available
+ * @field uid                   Union that is valid when `has_uid` is set to `true`
+ * @field uid.uid               uid of user that was logged in.
+ *
+ * @note This is a connection-level event.  An SSH connection that is used
+ * for multiple interactive sessions and/or non-interactive commands will
+ * emit only a single successful login event.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_openssh_login_t struct {
 	success             bool
 	result_type         Es_openssh_login_result_type_t
@@ -1534,6 +1800,20 @@ type Es_event_openssh_login_t struct {
 	uid                 uint32
 }
 
+/**
+ * @brief Notification for OpenSSH logout event.
+ *
+ * @field source_address_type   Type of address used in the connection.
+ * @field source_address        Source address of the connection.
+ * @field username              Username which got logged out.
+ * @field uid                   uid of user that was logged out.
+ *
+ * @note This is a connection-level event.  An SSH connection that is used
+ * for multiple interactive sessions and/or non-interactive commands will
+ * emit only a single logout event.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_openssh_logout_t struct {
 	success             bool
 	result_type         Es_openssh_login_result_type_t
@@ -1543,6 +1823,18 @@ type Es_event_openssh_logout_t struct {
 	uid                 uint32
 }
 
+/**
+ * @brief Notification for authenticated login event from /usr/bin/login.
+ *
+ * @field success               True iff login was successful.
+ * @field failure_message       Optional. Failure message generated.
+ * @field username              Username used for login.
+ * @field has_uid               Describes whether or not the uid of the user logged in is available or not.
+ * @field uid                   Union that is valid when `has_uid` is set to `true`
+ * @field uid.uid               uid of user that was logged in.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_login_login_t struct {
 	success         bool
 	failure_message Es_string_token_t
@@ -1551,23 +1843,83 @@ type Es_event_login_login_t struct {
 	uid             uint32
 }
 
+/**
+ * @brief Notification for authenticated logout event from /usr/bin/login.
+ *
+ * @field username              Username used for login.
+ * @field uid                   uid of user that was logged in.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_login_logout_t struct {
 	username Es_string_token_t
 	uid      uint32
 }
 
+/**
+ * @brief Notification for launch item being made known to background
+ *        task management.  This includes launch agents and daemons as
+ *        well as login items added by the user, via MDM or by an app.
+ *
+ * @field instigator            Optional.  Process that instigated the BTM operation
+ *                              (XPC caller that asked for the item to be added).
+ * @field app                   Optional.  App process that registered the item.
+ * @field item                  BTM launch item.
+ * @field executable_path       Optional.  If available and applicable, the POSIX executable
+ *                              path from the launchd plist.
+ *                              If the path is relative, it is relative to item->app_url.
+ *
+ * @note May be emitted for items where an add was already seen previously,
+ *       with or without the item having changed.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_btm_launch_item_add_t struct {
 	instigator *Es_process_t
 	is_update  bool
 	profile    *Es_profile_t
 }
 
+/**
+ * @brief Notification for launch item being removed from background
+ *        task management.  This includes launch agents and daemons as
+ *        well as login items added by the user, via MDM or by an app.
+ *
+ * @field instigator            Optional.  Process that instigated the BTM operation
+ *                              (XPC caller that asked for the item to be removed).
+ * @field app                   Optional.  App process that registered the item.
+ * @field item                  BTM launch item.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_btm_launch_item_remove_t struct {
 	instigator *Es_process_t
 	app        *Es_process_t
 	item       *Es_btm_launch_item_t
 }
 
+/**
+ * @brief Notification for a su policy decisions events.
+ *
+ * @field success           True iff su was successful.
+ * @field failure_message   Optional. If success is false, a failure message is contained in this field
+ * @field from_uid          The uid of the user who initiated the su
+ * @field from_name         The name of the user who initiated the su
+ * @field has_to_uid        True iff su was successful, Describes whether or not the to_uid is interpretable
+ * @field to_uid            Optional. If success, the user ID that is going to be substituted
+ * @field to_username       Optional. If success, the user name that is going to be substituted
+ * @field shell             Optional. If success, the shell is going to execute
+ * @field argc              The length of argv
+ * @field argv              If success, the arguments are passed into to the shell
+ * @field env_count         The length of env
+ * @field env               If success, list of environment variables that is going to be substituted
+ *
+ * @note This event type does not support caching (notify-only). Should always
+ * emit on success but will only emit on security relevant failures. For example,
+ * Endpoint Security clients will not get an event for su being passed invalid
+ * command line arguments.
+ *
+ */
 type Es_event_su_t struct {
 	success         bool
 	failure_message Es_string_token_t
@@ -1594,11 +1946,36 @@ const (
 	ES_SUDO_PLUGIN_TYPE_APPROVAL
 )
 
+/**
+ * @brief Provides context about failures in es_event_sudo_t.
+ *
+ * @field plugin_name      The sudo plugin that initiated the reject
+ * @field plugin_type      The sudo plugin type that initiated the reject
+ * @field failure_message  A reason represented by a string for the failure
+ *
+ */
 type Es_sudo_reject_info_t struct {
 	plugin_name     Es_string_token_t
 	plugin_type     Es_sudo_plugin_type_t
 	failure_message Es_string_token_t
 }
+
+/**
+ * @brief Notification for a sudo event.
+ *
+ * @field success          True iff sudo was successful
+ * @field reject_info      Optional. When success is false, describes why sudo was rejected
+ * @field has_from_uid     Describes whether or not the from_uid is interpretable
+ * @field from_uid         Optional. The uid of the user who initiated the su
+ * @field from_name        Optional. The name of the user who initiated the su
+ * @field has_to_uid       Describes whether or not the to_uid is interpretable
+ * @field to_uid           Optional. If success, the user ID that is going to be substituted
+ * @field to_username      Optional. If success, the user name that is going to be substituted
+ * @field command          Optional. The command to be run
+ *
+ * @note This event type does not support caching (notify-only).
+ *
+ */
 
 type Es_event_sudo_t struct {
 	success       bool
@@ -1611,17 +1988,47 @@ type Es_event_sudo_t struct {
 	command       Es_string_token_t
 }
 
+/**
+ * @brief Notification for Profiles installed on the system.
+ *
+ * @field instigator            Process that instigated the Profile install or update.
+ * @field is_update             Indicates if the profile is an update to an already installed
+ * 								profile.
+ * @field item                  Profile install item.
+ *
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_profile_add_t struct {
 	instigator *Es_process_t
 	is_update  bool
 	profile    *Es_profile_t
 }
 
+/**
+ * @brief Notification for Profiles removed on the system.
+ * @field instigator            Process that instigated the Profile removal.
+ * @field item                  Profile being removed.
+ *
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_profile_remove_t struct {
 	instigator *Es_process_t
 	profile    *Es_profile_t
 }
 
+/**
+ * @brief Notification that a process peititioned for certain authorization rights
+ *
+ * @field instigator            Process that submitted the petition (XPC caller)
+ * @field petitioner            Process that created the petition
+ * @field flags                 Flags associated with the petition. Defined Security framework "Authorization/Authorizatioh.h"
+ * @field right_count           The number of elements in `rights`
+ * @field rights                Array of string tokens, each token is the name of a right being requested
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_authorization_petition_t struct {
 	instigator *Es_process_t
 	petitioner *Es_process_t
@@ -1629,12 +2036,33 @@ type Es_event_authorization_petition_t struct {
 	rights     []Es_string_token_t
 }
 
+/**
+ * @brief Describes, for a single right, the class of that right and if it was granted
+ *
+ * @field right_name            The name of the right being considered
+ * @field rule_class            The class of the right being considered
+ *                              The rule class determines how the operating system determines
+ *                              if it should be granted or not
+ * @field granted               Indicates if the right was granted or not
+ */
 type Es_authorization_result_t struct {
 	right_name string
 	rule_class Es_authorization_rule_class_t
 	granted    bool
 }
 
+/**
+ * @brief Notification that a process had it's right petition judged
+ *
+ * @field instigator            Process that submitted the petition (XPC caller)
+ * @field petitioner            Process that created the petition
+ * @field return_code           The overall result of the petition. 0 indicates success.
+ *                              Possible return codes are defined Security framework "Authorization/Authorizatioh.h"
+ * @field result_count          The number of elements in `results`
+ * @field results               Array of results. One for each right that was peititioned
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_authorization_judgement_t struct {
 	instigator  *Es_process_t
 	petitioner  *Es_process_t
@@ -1642,12 +2070,36 @@ type Es_event_authorization_judgement_t struct {
 	results     []Es_authorization_result_t
 }
 
+/**
+ * @brief The identity of a group member
+ *
+ * @field member_type    Indicates the type of the member, and how it is identified.
+ *                       Note that member_type indicates which field of member_value is initialised.
+ * @field member_value   The member identity.
+ */
 type Es_od_member_id_t struct {
 	member_type Es_od_member_type_t
 	uuid        uuid_t
 	name        Es_string_token_t
 }
 
+/**
+ * @brief Notification that a member was added to a group.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field group_name   The group to which the member was added.
+ * @field member       The identity of the member added.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note This event does not indicate that a member was actually added.
+ *       For example when adding a user to a group they are already a member of.
+ */
 type Es_event_od_group_add_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1657,6 +2109,23 @@ type Es_event_od_group_add_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that a member was removed from a group.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field group_name   The group from which the member was removed.
+ * @field member       The identity of the member removed.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note This event does not indicate that a member was actually removed.
+ *       For example when removing a user from a group they are not a member of.
+ */
 type Es_event_od_group_remove_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1666,6 +2135,15 @@ type Es_event_od_group_remove_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief An array of group member identities.
+ *
+ * @field member_type    Indicates the type of the members, and how they are identified.
+ *                       Note that member_type indicates which field of member_array is initialised.
+ * @field member_count   The number of elements in member_array.
+ * @field member_array   A union of pointers.
+ *                       The initialised member points to the first element of an array of member values.
+ */
 type Es_od_member_id_array_t struct {
 	member_type  Es_od_member_type_t
 	member_count int
@@ -1673,6 +2151,25 @@ type Es_od_member_id_array_t struct {
 	name         Es_string_token_t
 }
 
+/**
+ * @brief Notification that a group had it's members initialised or replaced.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field group_name   The group for which members were set.
+ * @field members      Array of new members.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note This event does not indicate that a member was actually removed.
+ *       For example when removing a user from a group they are not a member of.
+ */
 type Es_event_od_group_set_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1682,6 +2179,23 @@ type Es_event_od_group_set_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that an account had its password modified.
+ *
+ * @field instigator     Process that instigated operation (XPC caller).
+ * @field error_code     0 indicates the operation succeeded.
+ *                       Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field account_type   The type of the account for which the password was modified.
+ * @field account_name   The name of the account for which the password was modified.
+ * @field node_name      OD node being mutated.
+ *                       Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                       "/Active Directory/<domain>".
+ * @field db_path        Optional.  If node_name is "/Local/Default", this is
+ *                       the path of the database against which OD is
+ *                       authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_modify_password_t struct {
 	instigator   *Es_process_t
 	error_code   int
@@ -1691,6 +2205,22 @@ type Es_event_od_modify_password_t struct {
 	db_path      Es_string_token_t
 }
 
+/**
+ * @brief Notification that a user account was disabled.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the user account that was disabled.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_disable_user_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1699,6 +2229,22 @@ type Es_event_od_disable_user_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that a user account was enabled.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the user account that was enabled.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_enable_user_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1707,6 +2253,28 @@ type Es_event_od_enable_user_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that an attribute value was added to a record.
+ *
+ * @field instigator       Process that instigated operation (XPC caller).
+ * @field error_code       0 indicates the operation succeeded.
+ *                         Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field record_type      The type of the record to which the attribute value was added.
+ * @field record_name      The name of the record to which the attribute value was added.
+ * @field attribute_name   The name of the attribute to which the value was added.
+ * @field attribute_value  The value that was added.
+ * @field node_name        OD node being mutated.
+ *                         Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                         "/Active Directory/<domain>".
+ * @field db_path          Optional.  If node_name is "/Local/Default", this is
+ *                         the path of the database against which OD is
+ *                         authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note Attributes conceptually have the type `Map String (Set String)`.
+ *       Each OD record has a Map of attribute name to Set of attribute value.
+ *       When an attribute value is added, it is inserted into the set of values for that name.
+ */
 type Es_event_od_attribute_value_add_t struct {
 	instigator      *Es_process_t
 	error_code      int
@@ -1718,6 +2286,29 @@ type Es_event_od_attribute_value_add_t struct {
 	db_path         Es_string_token_t
 }
 
+/**
+ * @brief Notification that an attribute value was removed from a record.
+ *
+ * @field instigator       Process that instigated operation (XPC caller).
+ * @field error_code       0 indicates the operation succeeded.
+ *                         Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field record_type      The type of the record from which the attribute value was removed.
+ * @field record_name      The name of the record from which the attribute value was removed.
+ * @field attribute_name   The name of the attribute from which the value was removed.
+ * @field attribute_value  The value that was removed.
+ * @field node_name        OD node being mutated.
+ *                         Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                         "/Active Directory/<domain>".
+ * @field db_path          Optional.  If node_name is "/Local/Default", this is
+ *                         the path of the database against which OD is
+ *                         authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note Attributes conceptually have the type `Map String (Set String)`.
+ *       Each OD record has a Map of attribute name to Set of attribute value.
+ *       When an attribute value is removed, it is subtraced from the set of values for that name.
+ * @note Removing a value that was never added is a no-op.
+ */
 type Es_event_od_attribute_value_remove_t struct {
 	instigator      *Es_process_t
 	error_code      int
@@ -1729,6 +2320,30 @@ type Es_event_od_attribute_value_remove_t struct {
 	db_path         Es_string_token_t
 }
 
+/**
+ * @brief Notification that an attribute is being set.
+ *
+ * @field instigator              Process that instigated operation (XPC caller).
+ * @field error_code              0 indicates the operation succeeded.
+ *                                Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field record_type             The type of the record for which the attribute is being set.
+ * @field record_name             The name of the record for which the attribute is being set.
+ * @field attribute_name          The name of the attribute that was set.
+ * @field attribute_value_count   The size of attribute_value_array.
+ * @field attribute_value_array   Array of attribute values that were set.
+ * @field node_name               OD node being mutated.
+ *                                Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                                "/Active Directory/<domain>".
+ * @field db_path                 Optional.  If node_name is "/Local/Default", this is
+ *                                the path of the database against which OD is
+ *                                authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ * @note Attributes conceptually have the type `Map String (Set String)`.
+ *       Each OD record has a Map of attribute name to Set of attribute value.
+ *       An attribute set operation indicates the entire set of attribute values was replaced.
+ * @note The new set of attribute values may be empty.
+ */
 type Es_event_od_attribute_set_t struct {
 	instigator       *Es_process_t
 	error_code       int
@@ -1740,6 +2355,22 @@ type Es_event_od_attribute_set_t struct {
 	db_path          Es_string_token_t
 }
 
+/**
+ * @brief Notification that a user account was created.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the user account that was created.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_create_user_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1748,6 +2379,22 @@ type Es_event_od_create_user_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that a group was created.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the group that was created.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_create_group_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1756,6 +2403,22 @@ type Es_event_od_create_group_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that a user account was deleted.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the user account that was deleted.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_delete_user_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1764,6 +2427,22 @@ type Es_event_od_delete_user_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification that a group was deleted.
+ *
+ * @field instigator   Process that instigated operation (XPC caller).
+ * @field error_code   0 indicates the operation succeeded.
+ *                     Values inidicating specific failure reasons are defined in odconstants.h.
+ * @field user_name    The name of the group that was deleted.
+ * @field node_name    OD node being mutated.
+ *                     Typically one of "/Local/Default", "/LDAPv3/<server>" or
+ *                     "/Active Directory/<domain>".
+ * @field db_path      Optional.  If node_name is "/Local/Default", this is
+ *                     the path of the database against which OD is
+ *                     authenticating.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_od_delete_group_t struct {
 	instigator *Es_process_t
 	error_code int
@@ -1772,11 +2451,22 @@ type Es_event_od_delete_group_t struct {
 	db_path    Es_string_token_t
 }
 
+/**
+ * @brief Notification for an XPC connection being established to a named service.
+ *
+ * @field service_name          Service name of the named service.
+ * @field service_domain_type   The type of XPC domain in which the service resides in.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type Es_event_xpc_connect_t struct {
 	service_name        Es_string_token_t
 	service_domain_type Es_xpc_domain_type_t
 }
 
+/**
+ * Union of all possible events that can appear in an es_message_t
+ */
 type Es_events_t struct {
 	access                    Es_event_access_t
 	chdir                     Es_event_chdir_t
@@ -1845,6 +2535,9 @@ type Es_events_t struct {
 	unmount                   Es_event_unmount_t
 	utimes                    Es_event_utimes_t
 	write                     Es_event_write_t
+	//
+	// Events added in macOS 13.0 or later use nonnull pointers.
+	//
 	authentication            *Es_event_authentication_t
 	xp_malware_detected       *Es_event_xp_malware_detected_t
 	xp_malware_remediated     *Es_event_xp_malware_remediated_t
@@ -1882,11 +2575,92 @@ type Es_events_t struct {
 	xpc_connect               *Es_event_xpc_connect_t
 }
 
+/**
+ * es_result_t indicates the result of the ES subsystem authorization process
+ * The result_type field indicates if the result is an es_auth_result_t or a uint32_t (flags)
+ */
 type Es_result_t struct {
 	result_type Es_result_type_t
 	result      interface{}
 }
 
+/**
+ * @brief es_message_t is the top level datatype that encodes information sent
+ * from the ES subsystem to its clients.  Each security event being processed
+ * by the ES subsystem will be encoded in an es_message_t.  A message can be an
+ * authorization request or a notification of an event that has already taken
+ * place.
+ *
+ * @field version Indicates the message version; some fields are not available
+ *        and must not be accessed unless the message version is equal to or
+ *        higher than the message version at which the field was introduced.
+ * @field time The time at which the event was generated.
+ * @field mach_time The Mach absolute time at which the event was generated.
+ * @field deadline The Mach absolute time before which an auth event must
+ *        be responded to. If a client fails to respond to auth events prior to the `deadline`,
+ *        the client will be killed.
+ *        Each message can contain its own unique deadline, and some deadlines
+ *        can vary substantially. Clients must take care to inspect the deadline
+ *        value of each message to know how much time is allotted for processing.
+ * @field process Describes the process that took the action.
+ * @field seq_num Per-client, per-event-type sequence number that can be
+ *        inspected to detect whether the kernel had to drop events for this
+ *        client.  When no events are dropped for this client, seq_num
+ *        increments by 1 for every message of that event type.  When events
+ *        have been dropped, the difference between the last seen sequence
+ *        number of that event type plus 1 and seq_num of the received message
+ *        indicates the number of events that had to be dropped.
+ *        Dropped events generally indicate that more events were generated in
+ *        the kernel than the client was able to handle.
+ *        Field available only if message version >= 2.
+ *        @see global_seq_num
+ * @field action_type Indicates if the action field is an auth or notify action.
+ * @field action For auth events, contains the opaque auth ID that must be
+ *        supplied when responding to the event.  For notify events, describes
+ *        the result of the action.
+ * @field event_type Indicates which event struct is defined in the event union.
+ * @field event Contains data specific to the event type.
+ * @field thread Describes the thread that took the action.  May be NULL when
+ *        thread is not applicable, for example for trace events that describe
+ *        the traced process calling ptrace(PT_TRACE_ME) or for cs invalidated
+ *        events that are a result of another process calling
+ *        csops(CS_OPS_MARKINVALID).
+ *        Field available only if message version >= 4.
+ * @field global_seq_num Per-client sequence number that can be inspected to
+ *        detect whether the kernel had to drop events for this client. When no
+ *        events are dropped for this client, global_seq_num increments by 1 for
+ *        every message. When events have been dropped, the difference between
+ *        the last seen global sequence number and the global_seq_num of the
+ *        received message indicates the number of events that had to be dropped.
+ *        Dropped events generally indicate that more events were generated in
+ *        the kernel than the client was able to handle.
+ *        Field available only if message version >= 4.
+ *        @see seq_num
+ * @field opaque Opaque data that must not be accessed directly.
+ *
+ * @note For events that can be authorized there are unique NOTIFY and AUTH
+ * event types for the same event data, eg: event.exec is the correct union
+ * label for both ES_EVENT_TYPE_AUTH_EXEC and ES_EVENT_TYPE_NOTIFY_EXEC event
+ * types.
+ *
+ * @note For fields marked only available in specific message versions, all
+ * access must be guarded at runtime by checking the value of the message
+ * version field, e.g.
+ * ```
+ * if (msg->version >= 2) {
+ *     acl = msg->event.create.acl;
+ * }
+ * ```
+ *
+ * @note Fields using Mach time are in the resolution matching the ES client's
+ * architecture.  This means they can be compared to mach_absolute_time() and
+ * converted to nanoseconds with the help of mach_timebase_info().  Further
+ * note that on Apple silicon, x86_64 clients running under Rosetta 2 will see
+ * Mach times in a different resolution than native arm64 clients.  For more
+ * information on differences regarding Mach time on Apple silicon and Intel-based
+ * Mac computers, see "Addressing Architectural Differences in Your macOS Code":
+ * https://developer.apple.com/documentation/apple_silicon/addressing_architectural_differences_in_your_macos_code
+ */
 type Es_message_t struct {
 	version        uint32
 	time           time.Time

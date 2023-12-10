@@ -6,50 +6,50 @@ type audit_token_t struct {
 	val [8]uint32
 }
 
-type es_action_type_t int
+type Es_action_type_t int
 
 const (
-	ES_ACTION_TYPE_AUTH es_action_type_t = iota
+	ES_ACTION_TYPE_AUTH Es_action_type_t = iota
 	ES_ACTION_TYPE_NOTIFY
 )
 
-type es_set_or_clear_t int
+type Es_set_or_clear_t int
 
 const (
-	ES_SET es_set_or_clear_t = iota
+	ES_SET Es_set_or_clear_t = iota
 	ES_CLEAR
 )
 
 /**
- * @brief This enum describes the type of the es_event_proc_check_t event that are currently used
+ * @brief This enum describes the type of the Es_event_proc_check_t event that are currently used
  *
  * @note ES_PROC_CHECK_TYPE_KERNMSGBUF  ES_PROC_CHECK_TYPE_TERMINATE and
  * ES_PROC_CHECK_TYPE_UDATA_INFO are deprecated and no proc_check messages will be generated
  * for the corresponding proc_info call numbers.
  * The terminate callnum is covered by the signal event.
  */
-type es_proc_check_type_t int
+type Es_proc_check_type_t int
 
 const (
-	ES_PROC_CHECK_TYPE_LISTPIDS        es_proc_check_type_t = 0x1
-	ES_PROC_CHECK_TYPE_PIDINFO         es_proc_check_type_t = 0x2
-	ES_PROC_CHECK_TYPE_PIDFDINFO       es_proc_check_type_t = 0x3
-	ES_PROC_CHECK_TYPE_KERNMSGBUF      es_proc_check_type_t = 0x4 // deprecated  not generated
-	ES_PROC_CHECK_TYPE_SETCONTROL      es_proc_check_type_t = 0x5
-	ES_PROC_CHECK_TYPE_PIDFILEPORTINFO es_proc_check_type_t = 0x6
-	ES_PROC_CHECK_TYPE_TERMINATE       es_proc_check_type_t = 0x7 // deprecated  not generated
-	ES_PROC_CHECK_TYPE_DIRTYCONTROL    es_proc_check_type_t = 0x8
-	ES_PROC_CHECK_TYPE_PIDRUSAGE       es_proc_check_type_t = 0x9
-	ES_PROC_CHECK_TYPE_UDATA_INFOv     es_proc_check_type_t = 0xe // deprecated  not generated
+	ES_PROC_CHECK_TYPE_LISTPIDS        Es_proc_check_type_t = 0x1
+	ES_PROC_CHECK_TYPE_PIDINFO         Es_proc_check_type_t = 0x2
+	ES_PROC_CHECK_TYPE_PIDFDINFO       Es_proc_check_type_t = 0x3
+	ES_PROC_CHECK_TYPE_KERNMSGBUF      Es_proc_check_type_t = 0x4 // deprecated  not generated
+	ES_PROC_CHECK_TYPE_SETCONTROL      Es_proc_check_type_t = 0x5
+	ES_PROC_CHECK_TYPE_PIDFILEPORTINFO Es_proc_check_type_t = 0x6
+	ES_PROC_CHECK_TYPE_TERMINATE       Es_proc_check_type_t = 0x7 // deprecated  not generated
+	ES_PROC_CHECK_TYPE_DIRTYCONTROL    Es_proc_check_type_t = 0x8
+	ES_PROC_CHECK_TYPE_PIDRUSAGE       Es_proc_check_type_t = 0x9
+	ES_PROC_CHECK_TYPE_UDATA_INFOv     Es_proc_check_type_t = 0xe // deprecated  not generated
 )
 
 /**
  * @brief This enum describes the types of XPC service domains.
  */
-type es_xpc_domain_type_t int
+type Es_xpc_domain_type_t int
 
 const (
-	ES_XPC_DOMAIN_TYPE_SYSTEM es_xpc_domain_type_t = iota + 1
+	ES_XPC_DOMAIN_TYPE_SYSTEM Es_xpc_domain_type_t = iota + 1
 	ES_XPC_DOMAIN_TYPE_USER
 	ES_XPC_DOMAIN_TYPE_USER_LOGIN
 	ES_XPC_DOMAIN_TYPE_SESSION
@@ -63,10 +63,10 @@ const (
  * @brief This enum describes the types of authentications that
  * ES_EVENT_TYPE_NOTIFY_AUTHENTICATION can describe.
  */
-type es_authentication_type_t int
+type Es_authentication_type_t int
 
 const (
-	ES_AUTHENTICATION_TYPE_OD es_authentication_type_t = iota
+	ES_AUTHENTICATION_TYPE_OD Es_authentication_type_t = iota
 	ES_AUTHENTICATION_TYPE_TOUCHID
 	ES_AUTHENTICATION_TYPE_TOKEN
 	ES_AUTHENTICATION_TYPE_AUTO_UNLOCK
@@ -82,17 +82,17 @@ const (
  * @discussion When a program subscribes to and receives an AUTH-related event  it must respond
  * with an appropriate result indicating whether or not the operation should be allowed to continue.
  * The valid API options are:
- * - es_respond_auth_result
- * - es_respond_flags_result
+ * - Es_respond_auth_result
+ * - Es_respond_flags_result
  *
- * Currently  only ES_EVENT_TYPE_AUTH_OPEN must use es_respond_flags_result. All other AUTH events
- * must use es_respond_auth_result.
+ * Currently  only ES_EVENT_TYPE_AUTH_OPEN must use Es_respond_flags_result. All other AUTH events
+ * must use Es_respond_auth_result.
  */
-type es_event_type_t int
+type Es_event_type_t int
 
 const (
 	// The following events are available beginning in macOS 10.15
-	ES_EVENT_TYPE_AUTH_EXEC es_event_type_t = iota
+	ES_EVENT_TYPE_AUTH_EXEC Es_event_type_t = iota
 	ES_EVENT_TYPE_AUTH_OPEN
 	ES_EVENT_TYPE_AUTH_KEXTLOAD
 	ES_EVENT_TYPE_AUTH_MMAP
@@ -253,21 +253,21 @@ const (
 )
 
 /**
- * @brief Valid authorization values to be used when responding to a es_message_t auth event
+ * @brief Valid authorization values to be used when responding to a Es_message_t auth event
  */
-type es_auth_result_t int
+type Es_auth_result_t int
 
 const (
 	/// The event is authorized and should be allowed to continue
-	ES_AUTH_RESULT_ALLOW es_auth_result_t = iota
+	ES_AUTH_RESULT_ALLOW Es_auth_result_t = iota
 	/// The event is not authorized and should be blocked
 	ES_AUTH_RESULT_DENY
 )
 
 /**
- * @brief Valid values for the result_type of es_result_t to indicate the appropriate union member to use
+ * @brief Valid values for the result_type of Es_result_t to indicate the appropriate union member to use
  */
-type es_result_type_t int
+type Es_result_type_t int
 
 const (
 	/// The result is an auth result
@@ -279,7 +279,7 @@ const (
 /**
  * @brief Return value for functions that can only fail in one way
  */
-type es_return_t int
+type Es_return_t int
 
 const (
 	ES_RETURN_SUCCESS = iota
@@ -289,7 +289,7 @@ const (
 /**
  * @brief Error conditions for responding to a message
  */
-type es_respond_result_t int
+type Es_respond_result_t int
 
 const (
 	ES_RESPOND_RESULT_SUCCESS = iota
@@ -302,17 +302,17 @@ const (
 	///The provided message has been responded to more than once
 	ES_RESPOND_RESULT_ERR_DUPLICATE_RESPONSE
 	///Either an inappropriate response API was used for the event type (ensure using proper
-	///es_respond_auth_result or es_respond_flags_result function) or the event is notification only.
+	///es_respond_auth_result or Es_respond_flags_result function) or the event is notification only.
 	ES_RESPOND_RESULT_ERR_EVENT_TYPE
 )
 
 /**
  * @brief Error conditions for creating a new client
  */
-type es_new_client_result_t int
+type Es_new_client_result_t int
 
 const (
-	ES_NEW_CLIENT_RESULT_SUCCESS es_new_client_result_t = iota
+	ES_NEW_CLIENT_RESULT_SUCCESS Es_new_client_result_t = iota
 	/// One or more invalid arguments were provided.
 	ES_NEW_CLIENT_RESULT_ERR_INVALID_ARGUMENT
 	/// Communication with the ES subsystem failed  or other error condition.
@@ -330,10 +330,10 @@ const (
 /**
  * @brief Error conditions for clearing the authorisation caches
  */
-type es_clear_cache_result_t int
+type Es_clear_cache_result_t int
 
 const (
-	ES_CLEAR_CACHE_RESULT_SUCCESS es_clear_cache_result_t = iota
+	ES_CLEAR_CACHE_RESULT_SUCCESS Es_clear_cache_result_t = iota
 	///Communication with the ES subsystem failed
 	ES_CLEAR_CACHE_RESULT_ERR_INTERNAL
 	///Rate of calls is too high. Slow down.
@@ -343,7 +343,7 @@ const (
 /**
  * @brief Structure buffer with size
  */
-type es_token_t struct {
+type Es_token_t struct {
 	// Size of the `data` field in bytes
 	size int64
 	data bytes.Buffer
@@ -352,7 +352,7 @@ type es_token_t struct {
 /**
  * @brief Structure for handling strings
  */
-type es_string_token_t struct {
+type Es_string_token_t struct {
 	// Length of the `data` field. Equivalent to strlen().
 	length int64
 	data   string
@@ -361,11 +361,11 @@ type es_string_token_t struct {
 /**
  * @brief Values that will be paired with path strings to describe the type of the path
  */
-type es_mute_path_type_t int
+type Es_mute_path_type_t int
 
 const (
 	/// Value to describe a path prefix
-	ES_MUTE_PATH_TYPE_PREFIX es_mute_path_type_t = iota
+	ES_MUTE_PATH_TYPE_PREFIX Es_mute_path_type_t = iota
 	/// Value to describe a path literal
 	ES_MUTE_PATH_TYPE_LITERAL
 	/// Value to describe a target path prefix
@@ -380,13 +380,13 @@ const (
  * @field type Indicates if the path is a prefix or literal  and what type of muting applies.
  * @field event_count The number of events contained in the `events` array.
  * @field events Array of event types for which the path is muted.
- * @field path The muted path. (Note: es_string_token_t is a char array and length)
+ * @field path The muted path. (Note: Es_string_token_t is a char array and length)
  */
-type es_muted_path_t struct {
-	type_       es_mute_path_type_t
+type Es_muted_path_t struct {
+	type_       Es_mute_path_type_t
 	event_count uint64
-	events      []es_event_type_t
-	path        es_string_token_t
+	events      []Es_event_type_t
+	path        Es_string_token_t
 }
 
 /**
@@ -395,9 +395,9 @@ type es_muted_path_t struct {
  * @field count The number of elements in the `paths` array.
  * @field paths Array of muted paths.
  */
-type es_muted_paths_t struct {
+type Es_muted_paths_t struct {
 	count int64
-	paths []es_muted_path_t
+	paths []Es_muted_path_t
 }
 
 /**
@@ -407,10 +407,10 @@ type es_muted_paths_t struct {
  * @field event_count The number of events contained in the `events` array.
  * @field events Array of event types for which the process is muted.
  */
-type es_muted_process_t struct {
+type Es_muted_process_t struct {
 	audit_token audit_token_t
 	event_count uint64
-	events      []es_event_type_t
+	events      []Es_event_type_t
 }
 
 /**
@@ -419,15 +419,15 @@ type es_muted_process_t struct {
  * @field count The number of elements in the `processes` array.
  * @field processes Array of muted processes.
  */
-type es_muted_processes_t struct {
+type Es_muted_processes_t struct {
 	count     uint64
-	processes es_muted_process_t
+	processes Es_muted_process_t
 }
 
 /**
  * Type of a network address.
  */
-type es_address_type_t int
+type Es_address_type_t int
 
 const (
 	/// No source address available.
@@ -440,7 +440,7 @@ const (
 	ES_ADDRESS_TYPE_NAMED_SOCKET
 )
 
-type es_mute_inversion_type_t int
+type Es_mute_inversion_type_t int
 
 const (
 	ES_MUTE_INVERSION_TYPE_PROCESS = iota
@@ -449,7 +449,7 @@ const (
 	ES_MUTE_INVERSION_TYPE_LAST
 )
 
-type es_mute_inverted_return_t int
+type Es_mute_inverted_return_t int
 
 const (
 	/// The type of muted queried was inverted
@@ -463,7 +463,7 @@ const (
 /**
  * The class of rules used to evaluate the petition for a specific authorization right
  */
-type es_authorization_rule_class_t int
+type Es_authorization_rule_class_t int
 
 const (
 	/// Right is judged on user properties
@@ -486,7 +486,7 @@ const (
 /**
  * Type of a group member
  */
-type es_od_member_type_t int
+type Es_od_member_type_t int
 
 const (
 	/// Group member is a user  designated by name
@@ -500,7 +500,7 @@ const (
 /**
  * Type of an account
  */
-type es_od_account_type_t int
+type Es_od_account_type_t int
 
 const (
 	ES_OD_ACCOUNT_TYPE_USER = iota
@@ -510,7 +510,7 @@ const (
 /**
  * Type of a record
  */
-type es_od_record_type_t int
+type Es_od_record_type_t int
 
 const (
 	ES_OD_RECORD_TYPE_USER = iota

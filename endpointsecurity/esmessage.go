@@ -829,16 +829,45 @@ type es_event_stat_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Change the root directory for a process
+ *
+ * @field target The directory which will be the new root
+ *
+ * @note Cache key for this event type:  (process executable file, target directory)
+ */
 type es_event_chroot_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief List extended attributes of a file
+ *
+ * @field target The file for which extended attributes are being retrieved
+ *
+ * @note Cache key for this event type:  (process executable file, target file)
+ */
 type es_event_listextattr_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Open a connection to an I/O Kit IOService
+ *
+ * @field user_client_type A constant specifying the type of connection to be
+ *        created, interpreted only by the IOService's family.
+ *        This field corresponds to the type argument to IOServiceOpen().
+ * @field user_client_class Meta class name of the user client instance.
+ *
+ * This event is fired when a process calls IOServiceOpen() in order to open
+ * a communications channel with an I/O Kit driver.  The event does not
+ * correspond to driver <-> device communication and is neither providing
+ * visibility nor access control into devices being attached.
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_iokit_open_t struct {
 	user_client_type  uint32
 	user_client_class es_string_token_t
@@ -853,48 +882,145 @@ const (
 	ES_GET_TASK_TYPE_IDENTITY_TOKEN
 )
 
+/**
+ * @brief Get a process's task control port
+ *
+ * @field target The process for which the task control port will be retrieved.
+ * @field type Type indicating how the process is obtaining the task port for
+ *        the target process.
+ *        Field available only if message version >= 5.
+ *
+ * This event is fired when a process obtains a send right to a task control
+ * port (e.g. task_for_pid(), task_identity_token_get_task_port(),
+ * processor_set_tasks() and other means).
+ *
+ * @note Task control ports were formerly known as simply "task ports".
+ *
+ * @note There are many legitimate reasons why a process might need to obtain
+ * a send right to a task control port of another process, not limited to intending
+ * to debug or suspend the target process.  For instance, frameworks and their
+ * daemons may need to obtain a task control port to fulfill requests made by the
+ * target process.  Obtaining a task control port is in itself not indicative of
+ * malicious activity.  Denying system processes acquiring task control ports may
+ * result in breaking system functionality in potentially fatal ways.
+ *
+ * @note Cache key for this event type:
+ * (process executable file, target executable file)
+ */
 type es_event_get_task_t struct {
 	target   *es_process_t
 	type_    es_get_task_type_t
 	reserved [60]uint8
 }
 
+/**
+ * @brief Get a process's task read port
+ *
+ * @field target The process for which the task read port will be retrieved.
+ * @field type Type indicating how the process is obtaining the task port for
+ *        the target process.
+ *        Field available only if message version >= 5.
+ *
+ * This event is fired when a process obtains a send right to a task read
+ * port (e.g. task_read_for_pid(), task_identity_token_get_task_port()).
+ *
+ * @note Cache key for this event type:
+ * (process executable file, target executable file)
+ */
 type es_event_get_task_read_t struct {
 	target   *es_process_t
 	type_    es_get_task_type_t
 	reserved [60]uint8
 }
 
+/**
+ * @brief Get a process's task inspect port
+ *
+ * @field target The process for which the task inspect port will be retrieved.
+ * @field type Type indicating how the process is obtaining the task port for
+ *        the target process.
+ *        Field available only if message version >= 5.
+ *
+ * This event is fired when a process obtains a send right to a task inspect
+ * port (e.g. task_inspect_for_pid(), task_identity_token_get_task_port()).
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_get_task_inspect_t struct {
 	target   *es_process_t
 	type_    es_get_task_type_t
 	reserved [60]uint8
 }
 
+/**
+ * @brief Get a process's task name port
+ *
+ * @field target The process for which the task name port will be retrieved.
+ * @field type Type indicating how the process is obtaining the task port for
+ *        the target process.
+ *        Field available only if message version >= 5.
+ *
+ * This event is fired when a process obtains a send right to a task name
+ * port (e.g. task_name_for_pid(), task_identity_token_get_task_port()).
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_get_task_name_t struct {
 	target   *es_process_t
 	type_    es_get_task_type_t
 	reserved [60]uint8
 }
 
+/**
+ * @brief Retrieve file system attributes
+ *
+ * @field attrlist The attributes that will be retrieved
+ * @field target The file for which attributes will be retrieved
+ *
+ * @note Cache key for this event type:  (process executable file, target file)
+ */
 type es_event_getattrlist_t struct {
 	attrlist struct{}
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Set file system attributes
+ *
+ * @field attrlist The attributes that will be modified
+ * @field target The file for which attributes will be modified
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_setattrlist_t struct {
 	attrlist struct{}
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Update file contents via the FileProvider framework
+ *
+ * @field source The staged file that has had its contents updated
+ * @field target_path The destination that the staged `source` file will be moved to
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_file_provider_update_t struct {
 	source      *es_file_t
 	target_path es_string_token_t
 	reserved    [64]uint8
 }
 
+/**
+ * @brief Materialize a file via the FileProvider framework
+ *
+ * @field source The staged file that has been materialized
+ * @field target The destination of the staged `source` file
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_file_provider_materialize_t struct {
 	instigator *es_process_t
 	source     *es_file_t
@@ -902,23 +1028,58 @@ type es_event_file_provider_materialize_t struct {
 	reserved   [64]uint8
 }
 
+/**
+ * @brief Resolve a symbolic link
+ *
+ * @field source The symbolic link that is attempting to be resolved
+ *
+ * @note This is not limited only to readlink(2). Other operations such as path lookups
+ * can also cause this event to be fired.
+ */
 type es_event_readlink_t struct {
 	source   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Lookup a file system object
+ *
+ * @field source_dir The current directory
+ * @field relative_target The path to lookup relative to the `source_dir`
+ *
+ * @note The `relative_target` data may contain untrusted user input.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_lookup_t struct {
 	source_dir      *es_file_t
 	relative_target es_string_token_t
 	reserved        [64]uint8
 }
 
+/**
+ * @brief Test file access
+ *
+ * @field mode Access permission to check
+ * @field target The file to check for access
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_access_t struct {
 	mode     int32
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Change file access and modification times (e.g. via utimes(2))
+ *
+ * @field target The path which will have its times modified
+ * @field atime The desired new access time
+ * @field mtime The desired new modification time
+ *
+ * @note Cache key for this event type:  (process executable file, target file)
+ */
 type es_event_utimes_t struct {
 	target   *es_file_t
 	atime    struct{}
@@ -926,6 +1087,15 @@ type es_event_utimes_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Clone a file
+ *
+ * @field source The file that will be cloned
+ * @field target_dir The directory into which the `source` file will be cloned
+ * @field target_name The name of the new file to which `source` will be cloned
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_clone_t struct {
 	source      *es_file_t
 	target_file *es_file_t
@@ -936,6 +1106,23 @@ type es_event_clone_t struct {
 	reserved    [56]uint8
 }
 
+/**
+ * @brief Copy a file using the copyfile syscall
+ *
+ * @field source The file that will be cloned
+ * @field target_file The file existing at the target path that will be overwritten
+ *                    by the copyfile operation.  NULL if no such file exists.
+ * @field target_dir The directory into which the `source` file will be copied
+ * @field target_name The name of the new file to which `source` will be copied
+ * @field mode Corresponds to mode argument of the copyfile syscall
+ * @field flags Corresponds to flags argument of the copyfile syscall
+ *
+ * @note Not to be confused with copyfile(3).
+ * @note Prior to macOS 12.0, the copyfile syscall fired open, unlink and auth
+ *       create events, but no notify create, nor write or close events.
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_copyfile_t struct {
 	source      *es_file_t
 	target_file *es_file_t
@@ -946,30 +1133,81 @@ type es_event_copyfile_t struct {
 	reserved    [56]uint8
 }
 
+/**
+ * @brief File control
+ *
+ * @field target The target file on which the file control command will be performed
+ * @field cmd The `cmd` argument given to fcntl(2)
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_fcntl_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Read directory entries
+ *
+ * @field target The directory whose contents will be read
+ *
+ * @note Cache key for this event type:  (process executable file, target directory)
+ */
 type es_event_readdir_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Retrieve file system path based on FSID
+ *
+ * @field target Describes the file system path that will be retrieved
+ *
+ * @note This event can fire multiple times for a single syscall, for example when the syscall
+ *       has to be retried due to racing VFS operations.
+ *
+ * @note Cache key for this event type:  (process executable file, target file)
+ */
 type es_event_fsgetpath_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Modify the system time
+ *
+ * @note This event is not fired if the program contains the entitlement
+ * com.apple.private.settime. Additionally, even if an ES client responds to
+ * ES_EVENT_TYPE_AUTH_SETTIME events with ES_AUTH_RESULT_ALLOW, the operation
+ * may still fail for other reasons (e.g. unprivileged user).
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_settime_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Duplicate a file descriptor
+ *
+ * @field target Describes the file the duplicated file descriptor points to
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_dup_t struct {
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Fired when a UNIX-domain socket is about to be bound to a path.
+ *
+ * @field dir Describes the directory the socket file is created in.
+ * @field filename The filename of the socket file.
+ * @field mode The mode of the socket file.
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_uipc_bind_t struct {
 	dir      *es_file_t
 	filename es_string_token_t
@@ -977,6 +1215,16 @@ type es_event_uipc_bind_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Fired when a UNIX-domain socket is about to be connected.
+ *
+ * @field file Describes the socket file that the socket is bound to.
+ * @field domain The communications domain of the socket (see socket(2)).
+ * @field type The type of the socket (see socket(2)).
+ * @field protocol The protocol of the socket (see socket(2)).
+ *
+ * @note Cache key for this event type:  (process executable file, socket file)
+ */
 type es_event_uipc_connect_t struct {
 	target   *es_file_t
 	domain   int
@@ -985,6 +1233,24 @@ type es_event_uipc_connect_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Set a file ACL.
+ *
+ * @field set_or_clear Describes whether or not the ACL on the `target` is being set or cleared
+ * @field acl Union that is valid when `set_or_clear` is set to `ES_SET`
+ * @field set The acl_t structure to be used by various acl(3) functions
+ *        @note The acl provided cannot be directly used by functions within
+ *        the <sys/acl.h> header. These functions can mutate the struct passed
+ *        into them, which is not compatible with the immutable nature of
+ *        es_message_t. Additionally, because this field is minimally constructed,
+ *        you must not use `acl_dup(3)` to get a mutable copy, as this can lead to
+ *        out of bounds memory access. To obtain a acl_t struct that is able to be
+ *        used with all functions within <sys/acl.h>, please use a combination of
+ *        `acl_copy_ext(3)` followed by `acl_copy_int(3)`.
+ * @field target Describes the file whose ACL is being set.
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_setacl_t struct {
 	target       *es_file_t
 	set_or_clear es_set_or_clear_t
@@ -992,16 +1258,39 @@ type es_event_setacl_t struct {
 	reserved     [64]uint8
 }
 
+/**
+ * @brief Fired when a pseudoterminal control device is granted
+ *
+ * @field dev Major and minor numbers of device
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_pty_grant_t struct {
 	dev      uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Fired when a pseudoterminal control device is closed
+ *
+ * @field dev Major and minor numbers of device
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_pty_close_t struct {
 	dev      uint32
 	reserved [64]uint8
 }
 
+/**
+ * @brief Access control check for retrieving process information.
+ *
+ * @field target The process for which the access will be checked
+ * @field type The type of call number used to check the access on the target process
+ * @field flavor The flavor used to check the access on the target process
+ *
+ * @note Cache key for this event type:  (process executable file, target process executable file, type)
+ */
 type es_event_proc_check_t struct {
 	target   *es_process_t
 	type_    es_proc_check_type_t
@@ -1009,12 +1298,23 @@ type es_event_proc_check_t struct {
 	reserved [64]uint8
 }
 
+/**
+ * @brief Access control check for searching a volume or a mounted file system
+ *
+ * @field attrlist The attributes that will be used to do the search
+ * @field target The volume whose contents will be searched
+ *
+ * @note Cache key for this event type:  (process executable file, target file)
+ */
 type es_event_searchfs_t struct {
 	attrlist struct{}
 	target   *es_file_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief This enum describes the type of suspend/resume operations that are currently used.
+ */
 type es_proc_suspend_resume_type_t int
 
 const (
@@ -1023,12 +1323,34 @@ const (
 	ES_PROC_SUSPEND_RESUME_TYPE_SHUTDOWN_SOCKETS
 )
 
+/**
+ * @brief Fired when one of pid_suspend, pid_resume or pid_shutdown_sockets
+ * is called on a process.
+ *
+ * @field target The process that is being suspended, resumed, or is the object
+ * of a pid_shutdown_sockets call.
+ * @field type The type of operation that was called on the target process.
+ *
+ * @note This event type does not support caching.
+ */
 type es_event_proc_suspend_resume_t struct {
 	target   *es_process_t
 	type_    es_proc_suspend_resume_type_t
 	reserved [64]uint8
 }
 
+/**
+ * @brief Code signing status for process was invalidated.
+ *
+ * @note This event fires when the CS_VALID bit is removed from a
+ * process' CS flags, that is, when the first invalid page is paged in
+ * for a process with an otherwise valid code signature, or when a
+ * process is explicitly invalidated by a csops(CS_OPS_MARKINVALID)
+ * syscall.  This event does not fire if CS_HARD was set, since CS_HARD
+ * by design prevents the process from going invalid.
+ *
+ * @note This event type does not support caching (notify-only).
+ */
 type es_event_cs_invalidated_t struct {
 	reserved [64]uint8
 }

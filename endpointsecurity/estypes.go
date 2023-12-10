@@ -20,10 +20,10 @@ const (
 	ES_CLEAR
 )
 
-/**
- * @brief This enum describes the type of the Es_event_proc_check_t event that are currently used
+/*
+ * This enum describes the type of the Es_event_proc_check_t event that are currently used
  *
- * @note ES_PROC_CHECK_TYPE_KERNMSGBUF  ES_PROC_CHECK_TYPE_TERMINATE and
+ * ES_PROC_CHECK_TYPE_KERNMSGBUF  ES_PROC_CHECK_TYPE_TERMINATE and
  * ES_PROC_CHECK_TYPE_UDATA_INFO are deprecated and no proc_check messages will be generated
  * for the corresponding proc_info call numbers.
  * The terminate callnum is covered by the signal event.
@@ -43,8 +43,8 @@ const (
 	ES_PROC_CHECK_TYPE_UDATA_INFOv     Es_proc_check_type_t = 0xe // deprecated  not generated
 )
 
-/**
- * @brief This enum describes the types of XPC service domains.
+/*
+ * This enum describes the types of XPC service domains.
  */
 type Es_xpc_domain_type_t int
 
@@ -59,8 +59,8 @@ const (
 	ES_XPC_DOMAIN_TYPE_GUI
 )
 
-/**
- * @brief This enum describes the types of authentications that
+/*
+ * This enum describes the types of authentications that
  * ES_EVENT_TYPE_NOTIFY_AUTHENTICATION can describe.
  */
 type Es_authentication_type_t int
@@ -76,10 +76,10 @@ const (
 	ES_AUTHENTICATION_TYPE_LAST
 )
 
-/**
+/*
  * The valid event types recognized by EndpointSecurity
  *
- * @discussion When a program subscribes to and receives an AUTH-related event  it must respond
+ * When a program subscribes to and receives an AUTH-related event  it must respond
  * with an appropriate result indicating whether or not the operation should be allowed to continue.
  * The valid API options are:
  * - Es_respond_auth_result
@@ -252,8 +252,8 @@ const (
 	ES_EVENT_TYPE_LAST
 )
 
-/**
- * @brief Valid authorization values to be used when responding to a Es_message_t auth event
+/*
+ * Valid authorization values to be used when responding to a Es_message_t auth event
  */
 type Es_auth_result_t int
 
@@ -264,8 +264,8 @@ const (
 	ES_AUTH_RESULT_DENY
 )
 
-/**
- * @brief Valid values for the result_type of Es_result_t to indicate the appropriate union member to use
+/*
+ * Valid values for the result_type of Es_result_t to indicate the appropriate union member to use
  */
 type Es_result_type_t int
 
@@ -276,8 +276,8 @@ const (
 	ES_RESULT_TYPE_FLAGS
 )
 
-/**
- * @brief Return value for functions that can only fail in one way
+/*
+ * Return value for functions that can only fail in one way
  */
 type Es_return_t int
 
@@ -286,8 +286,8 @@ const (
 	ES_RETURN_ERROR
 )
 
-/**
- * @brief Error conditions for responding to a message
+/*
+ * Error conditions for responding to a message
  */
 type Es_respond_result_t int
 
@@ -306,8 +306,8 @@ const (
 	ES_RESPOND_RESULT_ERR_EVENT_TYPE
 )
 
-/**
- * @brief Error conditions for creating a new client
+/*
+ * Error conditions for creating a new client
  */
 type Es_new_client_result_t int
 
@@ -327,8 +327,8 @@ const (
 	ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS
 )
 
-/**
- * @brief Error conditions for clearing the authorisation caches
+/*
+ * Error conditions for clearing the authorisation caches
  */
 type Es_clear_cache_result_t int
 
@@ -340,26 +340,26 @@ const (
 	ES_CLEAR_CACHE_RESULT_ERR_THROTTLE
 )
 
-/**
- * @brief Structure buffer with size
+/*
+ * Structure buffer with size
  */
 type Es_token_t struct {
-	// Size of the `data` field in bytes
+	// Size of the `data in bytes
 	size int64
 	data bytes.Buffer
 }
 
-/**
- * @brief Structure for handling strings
+/*
+ * Structure for handling strings
  */
 type Es_string_token_t struct {
-	// Length of the `data` field. Equivalent to strlen().
+	// Length of the `data. Equivalent to strlen().
 	length int64
 	data   string
 }
 
-/**
- * @brief Values that will be paired with path strings to describe the type of the path
+/*
+ * Values that will be paired with path strings to describe the type of the path
  */
 type Es_mute_path_type_t int
 
@@ -374,13 +374,13 @@ const (
 	ES_MUTE_PATH_TYPE_TARGET_LITERAL
 )
 
-/**
+/*
  * Structure to describe attributes of a muted path.
  *
- * @field type Indicates if the path is a prefix or literal  and what type of muting applies.
- * @field event_count The number of events contained in the `events` array.
- * @field events Array of event types for which the path is muted.
- * @field path The muted path. (Note: Es_string_token_t is a char array and length)
+ * type_ Indicates if the path is a prefix or literal  and what type of muting applies.
+ * event_count The number of events contained in the `events` array.
+ * events Array of event types for which the path is muted.
+ * path The muted path. (Note: Es_string_token_t is a char array and length)
  */
 type Es_muted_path_t struct {
 	type_       Es_mute_path_type_t
@@ -389,23 +389,23 @@ type Es_muted_path_t struct {
 	path        Es_string_token_t
 }
 
-/**
+/*
  * Structure for a set of muted paths.
  *
- * @field count The number of elements in the `paths` array.
- * @field paths Array of muted paths.
+ * count The number of elements in the `paths` array.
+ * paths Array of muted paths.
  */
 type Es_muted_paths_t struct {
 	count int64
 	paths []Es_muted_path_t
 }
 
-/**
+/*
  * Structure to describe attributes of a muted process.
  *
- * @field token The audit token of a muted process.
- * @field event_count The number of events contained in the `events` array.
- * @field events Array of event types for which the process is muted.
+ * token The audit token of a muted process.
+ * event_count The number of events contained in the `events` array.
+ * events Array of event types for which the process is muted.
  */
 type Es_muted_process_t struct {
 	audit_token audit_token_t
@@ -413,18 +413,18 @@ type Es_muted_process_t struct {
 	events      []Es_event_type_t
 }
 
-/**
+/*
  * Structure for a set of muted processes.
  *
- * @field count The number of elements in the `processes` array.
- * @field processes Array of muted processes.
+ * count The number of elements in the `processes` array.
+ * processes Array of muted processes.
  */
 type Es_muted_processes_t struct {
 	count     uint64
 	processes Es_muted_process_t
 }
 
-/**
+/*
  * Type of a network address.
  */
 type Es_address_type_t int
@@ -460,7 +460,7 @@ const (
 	ES_MUTE_INVERTED_ERROR
 )
 
-/**
+/*
  * The class of rules used to evaluate the petition for a specific authorization right
  */
 type Es_authorization_rule_class_t int
@@ -483,7 +483,7 @@ const (
 )
 
 // The following types are used in OpenDirectory (od) events
-/**
+/*
  * Type of a group member
  */
 type Es_od_member_type_t int
@@ -497,7 +497,7 @@ const (
 	ES_OD_MEMBER_TYPE_GROUP_UUID
 )
 
-/**
+/*
  * Type of an account
  */
 type Es_od_account_type_t int
@@ -507,7 +507,7 @@ const (
 	ES_OD_ACCOUNT_TYPE_COMPUTER
 )
 
-/**
+/*
  * Type of a record
  */
 type Es_od_record_type_t int
